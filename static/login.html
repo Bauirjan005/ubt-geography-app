@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подготовка к ЕНТ География — Вход</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .login-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #1e3c72;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #1e3c72;
+        }
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .toggle-text a {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .toggle-text a:hover {
+            text-decoration: underline;
+        }
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .info-text {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2 id="form-title">Вход в систему</h2>
+    <p class="subtitle">Платформа подготовки к ҰБТ География</p>
+
+    <form id="auth-form">
+        <div class="form-group" id="role-group" style="display: none;">
+            <label for="role">Ваша роль на платформе:</label>
+            <select id="role" name="role">
+                <option value="student">Студент (Оқушы)</option>
+                <option value="teacher">Учитель (Мұғалім)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="username-group" style="display: none;">
+            <label for="username">Имя пользователя (Логин):</label>
+            <input type="text" id="username" name="username" placeholder="Например: basanbae">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Электронная почта (Email):</label>
+            <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <div id="password-info" class="info-text" style="display: none;">Минимум 8 символов, 1 заглавная буква и 1 цифра.</div>
+        </div>
+
+        <button type="submit" id="submit-btn">Войти</button>
+    </form>
+
+    <div class="toggle-text">
+        <span id="toggle-desc">Нет аккаунта?</span>
+        <a href="#" id="toggle-link">Зарегистрироваться</a>
+    </div>
+
+    <div id="message"></div>
+</div>
+
+<script>
+    const form = document.getElementById('auth-form');
+    const formTitle = document.getElementById('form-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleLink = document.getElementById('toggle-link');
+    const toggleDesc = document.getElementById('toggle-desc');
+    const roleGroup = document.getElementById('role-group');
+    const usernameGroup = document.getElementById('username-group');
+    const passwordInfo = document.getElementById('password-info');
+    const messageDiv = document.getElementById('message');
+
+    let isLoginMode = true;
+
+    // Переключение между Входом и Регистрацией
+    toggleLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        isLoginMode = !isLoginMode;
+        messageDiv.innerText = '';
+        form.reset();
+
+        if (isLoginMode) {
+            formTitle.innerText = 'Вход в систему';
+            submitBtn.innerText = 'Войти';
+            toggleDesc.innerText = 'Нет аккаунта?';
+            toggleLink.innerText = 'Зарегистрироваться';
+            roleGroup.style.display = 'none';
+            usernameGroup.style.display = 'none';
+            passwordInfo.style.display = 'none';
+            document.getElementById('username').removeAttribute('required');
+        } else {
+            formTitle.innerText = 'Регистрация';
+            submitBtn.innerText = 'Создать аккаунт';
+            toggleDesc.innerText = 'Уже есть аккаунт?';
+            toggleLink.innerText = 'Войти';
+            roleGroup.style.display = 'block';
+            usernameGroup.style.display = 'block';
+            passwordInfo.style.display = 'block';
+            document.getElementById('username').setAttribute('required', 'true');
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        messageDiv.innerText = '';
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        let endpoint = '/api/login';
+        let payload = { email, password };
+
+        if (!isLoginMode) {
+            endpoint = '/api/register';
+            const username = document.getElementById('username').value;
+            const role = document.getElementById('role').value;
+            payload = { username, email, password, role };
+        }
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                messageDiv.style.color = 'green';
+                if (isLoginMode) {
+                    messageDiv.innerText = 'Успешный вход! Перенаправление...';
+                    setTimeout(() => {
+                        if (data.role === 'teacher') {
+                            window.location.href = '/teacher_dashboard.html';
+                        } else {
+                            window.location.href = '/student_dashboard.html';
+                        }
+                    }, 1500);
+                } else {
+                    messageDiv.innerText = 'Аккаунт успешно создан! Теперь войдите в систему.';
+                    // Автоматически переключаем на вход
+                    toggleLink.click();
+                }
+            } else {
+                messageDiv.style.color = 'red';
+                // Выводим ошибку, которую вернул сам Go сервер (например, "password must be at least 8 characters")
+                messageDiv.innerText = data.message || 'Произошла ошибка.';
+            }
+        } catch (err) {
+            messageDiv.style.color = 'red';
+            messageDiv.innerText = 'Ошибка связи с сервером.';
+        }
+    });
+</script>
+
+</body>
+</html>

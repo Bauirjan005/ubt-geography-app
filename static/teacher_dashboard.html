@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ҰБТ География — Мұғалім кабинеті</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:    #1a3d2b;
+      --forest2:   #254d37;
+      --forest3:   #2f6044;
+      --earth:     #c4934a;
+      --earth-l:   #f5e9d6;
+      --earth-d:   #9b6e2e;
+      --ocean:     #1e4d6b;
+      --ocean-l:   #dceef7;
+      --parchment: #f8f3ea;
+      --paper:     #ffffff;
+      --ink:       #1c1c1a;
+      --ink2:      #3a3a36;
+      --muted:     #8a8578;
+      --border:    #ddd6c8;
+      --success:   #2d7a4e;
+      --danger:    #c0392b;
+      --serif:     'Playfair Display', Georgia, serif;
+      --sans:      'Noto Sans', sans-serif;
+      --radius:    10px;
+    }
+
+    html { background: var(--parchment); color: var(--ink); font-family: var(--sans); font-size: 15px; }
+
+    /* ── Decorative top stripe ── */
+    .geo-stripe {
+      height: 4px;
+      background: linear-gradient(90deg, var(--forest) 0%, var(--forest3) 30%, var(--earth) 60%, var(--ocean) 100%);
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--forest);
+      padding: 0 40px;
+      height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; }
+    .logo-globe {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--ocean-l), var(--ocean));
+      border: 2px solid rgba(255,255,255,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .logo-text { display: flex; flex-direction: column; gap: 1px; }
+    .logo-main { font-family: var(--serif); font-size: 18px; color: #fff; letter-spacing: .3px; }
+    .logo-sub  { font-size: 11px; color: rgba(255,255,255,.55); letter-spacing: .8px; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .teacher-badge {
+      background: rgba(196,147,74,.18); border: 1px solid rgba(196,147,74,.4);
+      color: var(--earth); padding: 5px 14px; border-radius: 20px;
+      font-size: 12px; letter-spacing: .3px;
+    }
+    .btn-exit {
+      background: none; border: 1px solid rgba(255,255,255,.25);
+      color: rgba(255,255,255,.7); padding: 7px 18px; border-radius: var(--radius);
+      font-family: var(--sans); font-size: 13px; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-exit:hover { border-color: rgba(255,255,255,.6); color: #fff; }
+
+    /* ── Layout ── */
+    .shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: calc(100vh - 72px);
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      background: var(--paper);
+      border-right: 1px solid var(--border);
+      padding: 28px 20px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .aside-label {
+      font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--muted); padding: 4px 12px 10px; font-weight: 600;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius);
+      font-size: 14px; color: var(--ink2); cursor: pointer;
+      border: none; background: none; text-align: left; width: 100%;
+      transition: all .15s; font-family: var(--sans);
+    }
+    .nav-btn .icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-btn:hover { background: var(--parchment); color: var(--forest); }
+    .nav-btn.active {
+      background: var(--earth-l); color: var(--earth-d);
+      font-weight: 600;
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .aside-sub { font-size: 11px; letter-spacing: .5px; color: var(--muted); padding: 4px 12px 6px; }
+
+    /* Lesson chips in sidebar */
+    .lesson-chips { display: flex; flex-direction: column; gap: 3px; max-height: 300px; overflow-y: auto; }
+    .chip {
+      padding: 8px 12px; border-radius: 8px; font-size: 12px;
+      color: var(--ink2); cursor: pointer; transition: all .15s;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      border: none; background: none; text-align: left; font-family: var(--sans);
+    }
+    .chip:hover { background: var(--parchment); }
+    .chip.sel { background: rgba(26,61,43,.08); color: var(--forest); font-weight: 500; }
+
+    /* ── Main ── */
+    main { padding: 40px 48px; overflow-y: auto; }
+
+    .page-eyebrow {
+      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--earth-d); margin-bottom: 6px; font-weight: 600;
+    }
+    .page-title {
+      font-family: var(--serif); font-size: 30px; color: var(--forest);
+      margin-bottom: 4px; line-height: 1.15;
+    }
+    .page-desc { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    .card-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 26px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .step-circle {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: var(--forest); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 15px;
+    }
+    .card-title { font-family: var(--serif); font-size: 20px; color: var(--forest); }
+
+    /* ── Form ── */
+    .form-grid { display: grid; gap: 18px; }
+    .form-grid.two { grid-template-columns: 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.span2 { grid-column: 1/-1; }
+    .field label {
+      font-size: 12px; font-weight: 600; letter-spacing: .4px;
+      color: var(--ink2); text-transform: uppercase;
+    }
+    .field input, .field textarea, .field select {
+      background: var(--parchment); border: 1.5px solid var(--border);
+      border-radius: var(--radius); color: var(--ink);
+      font-family: var(--sans); font-size: 14px;
+      padding: 10px 14px; outline: none; width: 100%;
+      transition: border-color .2s, background .2s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--forest); background: #fff;
+    }
+    .field textarea { resize: vertical; min-height: 120px; line-height: 1.65; }
+
+    /* ── Question block ── */
+    .q-block {
+      background: var(--parchment); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 22px 24px; margin-bottom: 14px;
+      position: relative; animation: slideIn .25s ease both;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--earth-d); margin-bottom: 14px;
+    }
+    .q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .opt-row { display: flex; align-items: center; gap: 10px; }
+    .opt-letter {
+      width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0;
+      background: var(--forest); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+    }
+    .q-correct-row {
+      display: flex; align-items: center; gap: 12px; margin-top: 14px;
+      padding-top: 12px; border-top: 1px solid var(--border);
+    }
+    .q-correct-row label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .q-correct-row select { width: auto; min-width: 80px; }
+    .q-remove {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 20px; cursor: pointer; line-height: 1;
+      transition: color .15s;
+    }
+    .q-remove:hover { color: var(--danger); }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 12px; align-items: center; margin-top: 22px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 24px; border-radius: var(--radius);
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; border: none; transition: all .2s;
+    }
+    .btn-primary { background: var(--forest); color: #fff; }
+    .btn-primary:hover { background: var(--forest3); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,61,43,.3); }
+    .btn-secondary { background: none; border: 1.5px solid var(--border); color: var(--ink2); }
+    .btn-secondary:hover { border-color: var(--forest); color: var(--forest); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    /* ── Lesson selector hint ── */
+    .lesson-hint {
+      background: var(--earth-l); border: 1px solid rgba(196,147,74,.3);
+      border-radius: var(--radius); padding: 12px 16px;
+      font-size: 13px; color: var(--earth-d); margin-bottom: 22px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #active-lesson-name { font-weight: 600; color: var(--forest); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      padding: 13px 20px; border-radius: var(--radius);
+      font-size: 13px; font-family: var(--sans);
+      background: var(--ink); color: #fff;
+      opacity: 0; pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity .25s, transform .25s;
+      z-index: 999; max-width: 300px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    }
+    #toast.show { opacity: 1; transform: none; pointer-events: auto; }
+    #toast.ok  { background: var(--success); }
+    #toast.err { background: var(--danger); }
+
+    .spinner {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="geo-stripe"></div>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-globe">🌍</div>
+    <div class="logo-text">
+      <div class="logo-main">ҰБТ География</div>
+      <div class="logo-sub">оқыту платформасы</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="teacher-badge">👩‍🏫 Мұғалім</div>
+    <button class="btn-exit" onclick="logout()">Шығу</button>
+  </div>
+</header>
+
+<div class="shell">
+  <!-- ── Sidebar ── -->
+  <aside>
+    <div class="aside-label">Навигация</div>
+    <button class="nav-btn active" onclick="showTab('lessons')">
+      <span class="icon">📚</span> Сабақ жасау
+    </button>
+    <button class="nav-btn" onclick="showTab('questions')">
+      <span class="icon">❓</span> Сұрақ қосу
+    </button>
+
+    <div class="divider"></div>
+    <div class="aside-sub">Менің сабақтарым</div>
+    <div class="lesson-chips" id="lesson-chips">
+      <div style="font-size:12px;color:var(--muted);padding:4px 12px">Сабақ жоқ</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main>
+    <!-- TAB 1: Create Lesson -->
+    <div id="tab-lessons">
+      <div class="page-eyebrow">Мұғалім кабинеті</div>
+      <div class="page-title">Жаңа сабақ жасау</div>
+      <div class="page-desc">География бойынша ҰБТ-ға дайындық материалдарын қосыңыз.</div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="step-circle">1</div>
+          <div class="card-title">Сабақ мазмұны</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field span2">
+            <label>Сабақ атауы</label>
+            <input type="text" id="lesson-title" placeholder="мысалы: Қазақстанның физикалық географиясы"/>
+          </div>
+          <div class="field span2">
+            <label>Оқу материалы</label>
+            <textarea id="lesson-content" placeholder="Оқушылар оқитын теориялық мазмұнды осында жазыңыз. ҰБТ-ға қажетті анықтамалар, деректер және түсіндірмелер..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btn-save-lesson" onclick="saveLesson()">
+            💾 Сабақты сақтау
+          </button>
+          <span id="lesson-status" style="font-size:13px;color:var(--muted)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Add Questions -->
+    <div id="tab-questions" style="display:none">
+      <div class="page-eyebrow">Мұғалім кабинеті</div>
+      <div class="page-title">Сұрақтар қосу</div>
+      <div class="page-desc">ҰБТ үлгісіндегі тест сұрақтарын сабаққа бекітіңіз.</div>
+
+      <div class="lesson-hint">
+        <span>📌</span>
+        Белсенді сабақ: <span id="active-lesson-name">— сол жақтан сабақ таңдаңыз</span>
+      </div>
+
+      <div id="questions-wrap"></div>
+
+      <button class="btn btn-secondary" onclick="addQuestion()" style="margin-bottom:8px">
+        ➕ Сұрақ қосу
+      </button>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-save-q" onclick="saveQuestions()">
+          💾 Барлық сұрақтарды сақтау
+        </button>
+        <span id="q-status" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  let lessons = [];
+  let activeLessonId = null;
+  let qCount = 0;
+
+  async function init() {
+    await fetchLessons();
+    addQuestion();
+  }
+
+  // ── API ────────────────────────────────────────────────────────────────────
+  async function fetchLessons() {
+    try {
+      const r = await fetch('/api/teacher/lessons');
+      if (!r.ok) return;
+      const d = await r.json();
+      lessons = d.lessons || [];
+      renderChips();
+    } catch (_) {}
+  }
+
+  async function saveLesson() {
+    const title   = document.getElementById('lesson-title').value.trim();
+    const content = document.getElementById('lesson-content').value.trim();
+    if (!title) { toast('Сабақ атауын енгізіңіз', 'err'); return; }
+
+    const btn = document.getElementById('btn-save-lesson');
+    setBusy(btn, true);
+    try {
+      const r = await fetch('/api/teacher/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content })
+      });
+      const d = await r.json();
+      if (!r.ok) { toast(d.message || 'Қате', 'err'); return; }
+
+      lessons.push({ id: d.lesson_id, title });
+      renderChips();
+      selectLesson(d.lesson_id, title);
+      document.getElementById('lesson-title').value = '';
+      document.getElementById('lesson-content').value = '';
+      toast('Сабақ сақталды ✓', 'ok');
+      showTab('questions');
+    } catch (_) { toast('Сервермен байланыс жоқ', 'err'); }
+    finally { setBusy(btn, false); }
+  }
+
+  async function saveQuestions() {
+    if (!activeLessonId) { toast('Алдымен сабақ таңдаңыз', 'err'); return; }
+    const questions = collectQuestions();
+    if (!questions) return;
+
+    const btn = document.getElementById('btn-save-q');
+    setBusy(btn, true);
+    try {
+      const r = await fetch(`/api/teacher/lessons/${activeLessonId}/questions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions })
+      });
+      const d = await r.json();
+      if (!r.ok) { toast(d.message || 'Қате', 'err'); return; }
+      toast(`${questions.length} сұрақ сақталды ✓`, 'ok');
+    } catch (_) { toast('Сервермен байланыс жоқ', 'err'); }
+    finally { setBusy(btn, false); }
+  }
+
+  // ── Question builder ───────────────────────────────────────────────────────
+  function addQuestion() {
+    qCount++;
+    const n = qCount;
+    const wrap = document.getElementById('questions-wrap');
+    const el = document.createElement('div');
+    el.className = 'q-block card';
+    el.dataset.n = n;
+    el.innerHTML = `
+      <div class="q-label">Сұрақ ${String(n).padStart(2,'0')}</div>
+      <button class="q-remove" onclick="removeQ(${n})" title="Жою">×</button>
+      <div class="field" style="margin-bottom:14px">
+        <label>Сұрақ мәтіні</label>
+        <input type="text" class="q-text" placeholder="Географиялық сұрақты жазыңыз..."/>
+      </div>
+      <div class="q-options">
+        ${['A','B','C','D'].map(l => `
+          <div class="opt-row">
+            <div class="opt-letter">${l}</div>
+            <input type="text" class="q-opt" data-l="${l}" placeholder="${l} жауабы"/>
+          </div>`).join('')}
+      </div>
+      <div class="q-correct-row">
+        <label>Дұрыс жауап:</label>
+        <select class="q-ans">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </div>`;
+    wrap.appendChild(el);
+  }
+
+  function removeQ(n) {
+    document.querySelector(`.q-block[data-n="${n}"]`)?.remove();
+  }
+
+  function collectQuestions() {
+    const blocks = document.querySelectorAll('.q-block');
+    const out = [];
+    for (const [i, b] of blocks.entries()) {
+      const text = b.querySelector('.q-text').value.trim();
+      const a = b.querySelector('[data-l="A"]').value.trim();
+      const bv = b.querySelector('[data-l="B"]').value.trim();
+      const c = b.querySelector('[data-l="C"]').value.trim();
+      const d = b.querySelector('[data-l="D"]').value.trim();
+      const correct = b.querySelector('.q-ans').value;
+      if (!text || !a || !bv || !c || !d) {
+        toast(`${i+1}-сұрақ толық емес`, 'err');
+        return null;
+      }
+      out.push({ text, option_a: a, option_b: bv, option_c: c, option_d: d, correct });
+    }
+    if (out.length === 0) { toast('Кем дегенде бір сұрақ қосыңыз', 'err'); return null; }
+    return out;
+  }
+
+  // ── Sidebar ────────────────────────────────────────────────────────────────
+  function renderChips() {
+    const el = document.getElementById('lesson-chips');
+    if (!lessons.length) {
+      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 12px">Сабақ жоқ</div>';
+      return;
+    }
+    el.innerHTML = lessons.map(l => `
+      <button class="chip ${l.id === activeLessonId ? 'sel' : ''}"
+              onclick="selectLesson(${l.id},'${l.title.replace(/'/g,"\\'")}')">
+        📖 ${l.title}
+      </button>`).join('');
+  }
+
+  function selectLesson(id, title) {
+    activeLessonId = id;
+    const t = title || lessons.find(l => l.id === id)?.title || '';
+    document.getElementById('active-lesson-name').textContent = t;
+    renderChips();
+    showTab('questions');
+  }
+
+  // ── UI helpers ─────────────────────────────────────────────────────────────
+  function showTab(name) {
+    document.getElementById('tab-lessons').style.display   = name === 'lessons'   ? '' : 'none';
+    document.getElementById('tab-questions').style.display = name === 'questions' ? '' : 'none';
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && name === 'lessons') || (i === 1 && name === 'questions'));
+    });
+  }
+
+  function setBusy(btn, on) {
+    btn.disabled = on;
+    if (on) { btn._t = btn.innerHTML; btn.innerHTML = `<span class="spinner"></span> Сақталуда...`; }
+    else { btn.innerHTML = btn._t; }
+  }
+
+  let _tt;
+  function toast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.className = `show ${type}`;
+    clearTimeout(_tt); _tt = setTimeout(() => el.className = '', 3000);
+  }
+
+  async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
+    location.href = '/login.html';
+  }
+
+  init();
+</script>
+</body>
+</html>
