@@ -217,9 +217,9 @@ func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
 			Value:    sessionID,
 			Path:     "/",
 			HttpOnly: true,
-			Secure:   true, // set to false during local HTTP development
-			SameSite: http.SameSiteStrictMode,
-			MaxAge:   60 * 60 * 24 * 7, // 7 days
+			Secure:   false,                // true только для HTTPS
+			SameSite: http.SameSiteLaxMode, // Lax — для разработки на localhost
+			MaxAge:   60 * 60 * 24 * 7,
 		})
 
 		writeJSON(w, http.StatusOK, AuthResponse{
@@ -263,4 +263,40 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(v)
+}
+
+// handleMe возвращает данные текущего пользователя по его сессии.
+// GET /api/me
+// 200 — { id, username, email, role }
+// 401 — если не авторизован
+func handleMe(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("session_id")
+		if err != nil {
+			writeJSON(w, http.StatusUnauthorized, map[string]string{"message": "not authenticated"})
+			return
+		}
+
+		sess, ok := sessions.Get(cookie.Value)
+		if !ok {
+			writeJSON(w, http.StatusUnauthorized, map[string]string{"message": "session expired"})
+			return
+		}
+
+		var username, email string
+		err = db.QueryRow(
+			`SELECT username, email FROM users WHERE id = ?`, sess.UserID,
+		).Scan(&username, &email)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "database error"})
+			return
+		}
+
+		writeJSON(w, http.StatusOK, map[string]any{
+			"id":       sess.UserID,
+			"username": username,
+			"email":    email,
+			"role":     sess.Role,
+		})
+	}
 }

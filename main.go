@@ -2,78 +2,162 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
+	"time"
 
+	"github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
 )
 
 func main() {
-	// ── Database ──────────────────────────────────────────────────────────────
+	if err := godotenv.Load(); err != nil {
+		log.Println("ℹ️  .env файл табылмады — жүйе айнымалыларын қолданамыз")
+	}
+
+	if err := validateEnv(); err != nil {
+		log.Fatalf("❌ Конфигурация қатесі: %v", err)
+	}
+
+	ensureUploadDir()
+
 	db, err := sql.Open("sqlite", "./ubt.db?_journal_mode=WAL&_foreign_keys=on")
 	if err != nil {
-		log.Fatalf("failed to open database: %v", err)
+		log.Fatalf("❌ Дерекқорды ашу мүмкін болмады: %v", err)
 	}
 	defer db.Close()
 
-	if err := migrate(db); err != nil {
-		log.Fatalf("migration failed: %v", err)
+	if err := migrateAll(db); err != nil {
+		log.Fatalf("❌ Миграция қатесі: %v", err)
 	}
 
-	// ── Session store ─────────────────────────────────────────────────────────
 	sessions := NewSessionStore()
-
-	// ── Routes ────────────────────────────────────────────────────────────────
 	mux := http.NewServeMux()
 
-	// Public auth endpoints
+	// ── Public ────────────────────────────────────────────────────────────────
 	mux.Handle("/api/register", handleRegister(db))
 	mux.Handle("/api/login", handleLogin(db, sessions))
 	mux.Handle("/api/logout", requireAuth(sessions)(handleLogout(sessions)))
+	mux.Handle("/api/me", handleMe(db, sessions))
 
-	// Example protected routes (implement these next)
-	mux.Handle("/api/student/", requireRole(sessions, "student")(http.HandlerFunc(studentDashboard)))
-	mux.Handle("/api/teacher/", requireRole(sessions, "teacher")(http.HandlerFunc(teacherPanel)))
+	// ── Teacher: lessons + questions ──────────────────────────────────────────
+	RegisterTeacherRoutes(mux, db, sessions)
 
-	// Serve static files (your HTML/CSS/JS frontend)
+	// ── Teacher: materials + AI quiz + readers ────────────────────────────────
+	tGuard := requireRole(sessions, "teacher")
+
+	mux.Handle("/api/teacher/materials", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			switch r.Method {
+			case http.MethodGet:
+				handleListTeacherMaterials(db)(w, r)
+			case http.MethodPost:
+				handleUploadMaterial(db)(w, r)
+			default:
+				writeJSON(w, http.StatusMethodNotAllowed,
+					map[string]string{"message": "method not allowed"})
+			}
+		})))
+
+	mux.Handle("/api/teacher/materials/", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasSuffix(r.URL.Path, "/generate-quiz") && r.Method == http.MethodPost {
+				handleGenerateAIQuiz(db)(w, r)
+				return
+			}
+			if strings.HasSuffix(r.URL.Path, "/readers") && r.Method == http.MethodGet {
+				handleMaterialReaders(db)(w, r)
+				return
+			}
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
+		})))
+
+	// ── Teacher: AI quiz list + results ───────────────────────────────────────
+	mux.Handle("/api/teacher/ai-quizzes", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			handleListTeacherAIQuizzes(db)(w, r)
+		})))
+
+	mux.Handle("/api/teacher/ai-quizzes/", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasSuffix(r.URL.Path, "/results") {
+				handleGetAIQuizResults(db)(w, r)
+				return
+			}
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
+		})))
+
+	// ── Student: lessons + AI quizzes + materials ─────────────────────────────
+	// Барлығы student_handlers.go ішіндегі RegisterStudentRoutes арқылы тіркеледі
+	RegisterStudentRoutes(mux, db, sessions)
+
+	// ── Static files ──────────────────────────────────────────────────────────
 	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
-	log.Println("UBT server listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	// ── CORS ──────────────────────────────────────────────────────────────────
+	origins := []string{
+		"http://127.0.0.1:3000",
+		"http://localhost:3000",
+		"http://127.0.0.1:8080",
+		"http://localhost:8080",
+	}
+	handler := corsMiddleware(origins, mux)
+
+	server := &http.Server{
+		Addr:           "127.0.0.1:3000",
+		Handler:        handler,
+		ReadTimeout:    120 * time.Second,
+		WriteTimeout:   120 * time.Second,
+		IdleTimeout:    60 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	log.Println("✅ UBT сервері іске қосылды → http://127.0.0.1:3000")
+	log.Fatal(server.ListenAndServe())
 }
 
-// migrate creates tables if they don't exist yet.
-// In production, replace with a migration library (e.g. golang-migrate).
-func migrate(db *sql.DB) error {
-	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id            INTEGER PRIMARY KEY AUTOINCREMENT,
-			username      TEXT    NOT NULL,
-			email         TEXT    NOT NULL UNIQUE,
-			password_hash TEXT    NOT NULL,
-			role          TEXT    NOT NULL CHECK(role IN ('student', 'teacher')),
-			created_at    DATETIME NOT NULL
-		);
-
-		CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-	`)
-	return err
+func validateEnv() error {
+	keys := map[string]string{
+		"GEMINI_API_KEY":    os.Getenv("GEMINI_API_KEY"),
+		"DEEPSEEK_API_KEY":  os.Getenv("DEEPSEEK_API_KEY"),
+		"ANTHROPIC_API_KEY": os.Getenv("ANTHROPIC_API_KEY"),
+	}
+	for name, val := range keys {
+		if val != "" {
+			preview := val
+			if len(preview) > 10 {
+				preview = preview[:10] + "..."
+			}
+			log.Printf("✅ %s = %s", name, preview)
+			return nil
+		}
+	}
+	return fmt.Errorf(
+		"API кілті табылмады!\n" +
+			"  Тегін (Gemini): https://aistudio.google.com/app/apikey\n" +
+			"  → $env:GEMINI_API_KEY = 'AIzaSy...'")
 }
 
-// ─── Stub handlers (to be replaced in Part 2 & 3) ────────────────────────────
-
-func studentDashboard(w http.ResponseWriter, r *http.Request) {
-	sess := SessionFromContext(r)
-	writeJSON(w, http.StatusOK, map[string]any{
-		"message": "welcome, student!",
-		"user_id": sess.UserID,
-	})
-}
-
-func teacherPanel(w http.ResponseWriter, r *http.Request) {
-	sess := SessionFromContext(r)
-	writeJSON(w, http.StatusOK, map[string]any{
-		"message": "welcome, teacher!",
-		"user_id": sess.UserID,
+func corsMiddleware(allowedOrigins []string, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		for _, o := range allowedOrigins {
+			if o == origin {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+				w.Header().Set("Vary", "Origin")
+				break
+			}
+		}
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }

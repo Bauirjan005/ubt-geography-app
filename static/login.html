@@ -1,243 +1,313 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подготовка к ЕНТ География — Вход</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-        }
-        .login-container {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #1e3c72;
-        }
-        p.subtitle {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border-color 0.3s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2a5298;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #2a5298;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #1e3c72;
-        }
-        .toggle-text {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-        .toggle-text a {
-            color: #2a5298;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .toggle-text a:hover {
-            text-decoration: underline;
-        }
-        #message {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .info-text {
-            font-size: 11px;
-            color: #888;
-            margin-top: 4px;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ҰБТ География — Вход</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest:    #1a3d2b;
+      --forest3:   #2f6044;
+      --earth:     #c4934a;
+      --earth-l:   #f5e9d6;
+      --earth-d:   #9b6e2e;
+      --ocean:     #1e4d6b;
+      --ocean-l:   #dceef7;
+      --parchment: #f8f3ea;
+      --paper:     #ffffff;
+      --ink:       #1c1c1a;
+      --muted:     #8a8578;
+      --border:    #ddd6c8;
+      --danger:    #c0392b;
+      --danger-l:  #fde8e4;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'Noto Sans', sans-serif;
+    }
+    html, body {
+      min-height: 100vh;
+      background: var(--parchment);
+      font-family: var(--sans);
+      display: flex;
+      flex-direction: column;
+    }
+    .geo-stripe {
+      height: 4px;
+      background: linear-gradient(90deg, var(--forest), var(--forest3) 30%, var(--earth) 60%, var(--ocean));
+      flex-shrink: 0;
+    }
+    .page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 32px rgba(26,61,43,.08);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .logo-globe {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--ocean-l), var(--ocean));
+      border: 2px solid rgba(30,77,107,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .logo-text { display: flex; flex-direction: column; gap: 2px; }
+    .logo-main { font-family: var(--serif); font-size: 20px; color: var(--forest); }
+    .logo-sub  { font-size: 11px; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: var(--parchment);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+    .tab {
+      flex: 1; padding: 9px; border: none; background: none;
+      border-radius: 7px; font-family: var(--sans); font-size: 14px;
+      color: var(--muted); cursor: pointer; transition: all .2s;
+    }
+    .tab.active { background: var(--paper); color: var(--forest); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+    /* Form */
+    .form { display: flex; flex-direction: column; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 12px; font-weight: 600; letter-spacing: .4px; color: var(--ink); text-transform: uppercase; }
+    .field input, .field select {
+      background: var(--parchment); border: 1.5px solid var(--border);
+      border-radius: 10px; color: var(--ink); font-family: var(--sans);
+      font-size: 14px; padding: 12px 16px; outline: none; width: 100%;
+      transition: border-color .2s, background .2s;
+    }
+    .field input:focus, .field select:focus { border-color: var(--forest); background: #fff; }
+
+    .btn-submit {
+      background: var(--forest); color: #fff;
+      border: none; border-radius: 10px;
+      padding: 13px; font-family: var(--sans);
+      font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: var(--forest3); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,61,43,.3); }
+    .btn-submit:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .error-box {
+      background: var(--danger-l); border: 1px solid rgba(192,57,43,.25);
+      border-radius: 8px; padding: 11px 14px;
+      font-size: 13px; color: var(--danger);
+      display: none;
+    }
+    .error-box.show { display: block; animation: shake .3s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+      border-radius: 50%; animation: spin .6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      text-align: center; padding: 20px;
+      font-size: 12px; color: var(--muted);
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body>
+<div class="geo-stripe"></div>
 
-<div class="login-container">
-    <h2 id="form-title">Вход в систему</h2>
-    <p class="subtitle">Платформа подготовки к ҰБТ География</p>
-
-    <form id="auth-form">
-        <div class="form-group" id="role-group" style="display: none;">
-            <label for="role">Ваша роль на платформе:</label>
-            <select id="role" name="role">
-                <option value="student">Студент (Оқушы)</option>
-                <option value="teacher">Учитель (Мұғалім)</option>
-            </select>
-        </div>
-
-        <div class="form-group" id="username-group" style="display: none;">
-            <label for="username">Имя пользователя (Логин):</label>
-            <input type="text" id="username" name="username" placeholder="Например: basanbae">
-        </div>
-
-        <div class="form-group">
-            <label for="email">Электронная почта (Email):</label>
-            <input type="email" id="email" name="email" placeholder="example@mail.com" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required>
-            <div id="password-info" class="info-text" style="display: none;">Минимум 8 символов, 1 заглавная буква и 1 цифра.</div>
-        </div>
-
-        <button type="submit" id="submit-btn">Войти</button>
-    </form>
-
-    <div class="toggle-text">
-        <span id="toggle-desc">Нет аккаунта?</span>
-        <a href="#" id="toggle-link">Зарегистрироваться</a>
+<div class="page">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-globe">🌍</div>
+      <div class="logo-text">
+        <div class="logo-main">ҰБТ География</div>
+        <div class="logo-sub">оқыту платформасы</div>
+      </div>
     </div>
 
-    <div id="message"></div>
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Войти</button>
+      <button class="tab" id="tab-reg" onclick="switchTab('register')">Регистрация</button>
+    </div>
+
+    <!-- Ошибка -->
+    <div class="error-box" id="error-box"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="form">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="teacher@ubt.kz" autocomplete="email"/>
+        </div>
+        <div class="field">
+          <label>Пароль</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <button class="btn-submit" id="btn-login" onclick="doLogin()">Войти</button>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none">
+      <div class="form">
+        <div class="field">
+          <label>Имя</label>
+          <input type="text" id="reg-name" placeholder="Аяна Сейткали"/>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="teacher@ubt.kz"/>
+        </div>
+        <div class="field">
+          <label>Пароль (мин. 8 символов, 1 заглавная, 1 цифра)</label>
+          <input type="password" id="reg-password" placeholder="Secret123"/>
+        </div>
+        <div class="field">
+          <label>Роль</label>
+          <select id="reg-role">
+            <option value="teacher">👩‍🏫 Мұғалім (Учитель)</option>
+            <option value="student">🎓 Оқушы (Ученик)</option>
+          </select>
+        </div>
+        <button class="btn-submit" id="btn-reg" onclick="doRegister()">Зарегистрироваться</button>
+      </div>
+    </div>
+  </div>
 </div>
 
+<footer>ҰБТ География · оқыту платформасы</footer>
+
 <script>
-    const form = document.getElementById('auth-form');
-    const formTitle = document.getElementById('form-title');
-    const submitBtn = document.getElementById('submit-btn');
-    const toggleLink = document.getElementById('toggle-link');
-    const toggleDesc = document.getElementById('toggle-desc');
-    const roleGroup = document.getElementById('role-group');
-    const usernameGroup = document.getElementById('username-group');
-    const passwordInfo = document.getElementById('password-info');
-    const messageDiv = document.getElementById('message');
+  // ── Tab switching ──────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-reg').classList.toggle('active',   tab === 'register');
+    hideError();
+  }
 
-    let isLoginMode = true;
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg;
+    el.className = 'error-box show';
+  }
+  function hideError() {
+    document.getElementById('error-box').className = 'error-box';
+  }
 
-    // Переключение между Входом и Регистрацией
-    toggleLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        isLoginMode = !isLoginMode;
-        messageDiv.innerText = '';
-        form.reset();
+  function setBusy(btn, on) {
+    btn.disabled = on;
+    if (on) { btn._t = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span>Загрузка...'; }
+    else     { btn.innerHTML = btn._t; }
+  }
 
-        if (isLoginMode) {
-            formTitle.innerText = 'Вход в систему';
-            submitBtn.innerText = 'Войти';
-            toggleDesc.innerText = 'Нет аккаунта?';
-            toggleLink.innerText = 'Зарегистрироваться';
-            roleGroup.style.display = 'none';
-            usernameGroup.style.display = 'none';
-            passwordInfo.style.display = 'none';
-            document.getElementById('username').removeAttribute('required');
-        } else {
-            formTitle.innerText = 'Регистрация';
-            submitBtn.innerText = 'Создать аккаунт';
-            toggleDesc.innerText = 'Уже есть аккаунт?';
-            toggleLink.innerText = 'Войти';
-            roleGroup.style.display = 'block';
-            usernameGroup.style.display = 'block';
-            passwordInfo.style.display = 'block';
-            document.getElementById('username').setAttribute('required', 'true');
-        }
-    });
+  // ── Login ──────────────────────────────────────────────────────────────────
+  async function doLogin() {
+    hideError();
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) { showError('Заполните все поля'); return; }
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        messageDiv.innerText = '';
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    const btn = document.getElementById('btn-login');
+    setBusy(btn, true);
+    try {
+      const r = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const d = await r.json();
+      if (!r.ok) { showError(d.message || 'Неверный email или пароль'); return; }
 
-        let endpoint = '/api/login';
-        let payload = { email, password };
+      // Redirect based on role
+      if (d.role === 'teacher') {
+        window.location.href = '/teacher_dashboard.html';
+      } else {
+        window.location.href = '/student_dashboard.html';
+      }
+    } catch (_) {
+      showError('Нет соединения с сервером');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
 
-        if (!isLoginMode) {
-            endpoint = '/api/register';
-            const username = document.getElementById('username').value;
-            const role = document.getElementById('role').value;
-            payload = { username, email, password, role };
-        }
+  // ── Register ───────────────────────────────────────────────────────────────
+  async function doRegister() {
+    hideError();
+    const username = document.getElementById('reg-name').value.trim();
+    const email    = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role     = document.getElementById('reg-role').value;
 
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+    if (!username || !email || !password) { showError('Заполните все поля'); return; }
 
-            const data = await response.json();
+    const btn = document.getElementById('btn-reg');
+    setBusy(btn, true);
+    try {
+      const r = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, role })
+      });
+      const d = await r.json();
+      if (!r.ok) { showError(d.message || 'Ошибка регистрации'); return; }
 
-            if (response.ok) {
-                messageDiv.style.color = 'green';
-                if (isLoginMode) {
-                    messageDiv.innerText = 'Успешный вход! Перенаправление...';
-                    setTimeout(() => {
-                        if (data.role === 'teacher') {
-                            window.location.href = '/teacher_dashboard.html';
-                        } else {
-                            window.location.href = '/student_dashboard.html';
-                        }
-                    }, 1500);
-                } else {
-                    messageDiv.innerText = 'Аккаунт успешно создан! Теперь войдите в систему.';
-                    // Автоматически переключаем на вход
-                    toggleLink.click();
-                }
-            } else {
-                messageDiv.style.color = 'red';
-                // Выводим ошибку, которую вернул сам Go сервер (например, "password must be at least 8 characters")
-                messageDiv.innerText = data.message || 'Произошла ошибка.';
-            }
-        } catch (err) {
-            messageDiv.style.color = 'red';
-            messageDiv.innerText = 'Ошибка связи с сервером.';
-        }
-    });
+      // Auto-login after registration
+      const r2 = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const d2 = await r2.json();
+      if (d2.role === 'teacher') {
+        window.location.href = '/teacher_dashboard.html';
+      } else {
+        window.location.href = '/student_dashboard.html';
+      }
+    } catch (_) {
+      showError('Нет соединения с сервером');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const loginVisible = document.getElementById('form-login').style.display !== 'none';
+    if (loginVisible) doLogin(); else doRegister();
+  });
 </script>
-
 </body>
 </html>

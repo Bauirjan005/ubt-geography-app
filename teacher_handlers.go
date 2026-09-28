@@ -191,10 +191,12 @@ func handleSaveQuestions(db *sql.DB) http.HandlerFunc {
 				return
 			}
 		}
+
 		if err := tx.Commit(); err != nil {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "transaction failed"})
 			return
 		}
+
 		writeJSON(w, http.StatusOK, map[string]any{
 			"message":        "questions saved",
 			"question_count": len(req.Questions),
