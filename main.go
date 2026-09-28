@@ -98,16 +98,19 @@ func main() {
 	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	// ── CORS ──────────────────────────────────────────────────────────────────
-	origins := []string{
-		"http://127.0.0.1:3000",
-		"http://localhost:3000",
-		"http://127.0.0.1:8080",
-		"http://localhost:8080",
-	}
+origins := []string{
+    "http://127.0.0.1:3001",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8080",
+    "http://localhost:8080",
+}
+
 	handler := corsMiddleware(origins, mux)
 
 	server := &http.Server{
-		Addr:           "127.0.0.1:3000",
+		Addr:           "127.0.0.1:3001",
 		Handler:        handler,
 		ReadTimeout:    120 * time.Second,
 		WriteTimeout:   120 * time.Second,
@@ -115,7 +118,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Println("✅ UBT сервері іске қосылды → http://127.0.0.1:3000")
+	log.Println("✅ UBT сервері іске қосылды → http://127.0.0.1:3001")
 	log.Fatal(server.ListenAndServe())
 }
 
