@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"bytes"
@@ -127,20 +127,28 @@ func parseQuestions(raw string) ([]rawAIQuestion, error) {
 
 func callGemini(apiKey, text, difficulty string) ([]rawAIQuestion, error) {
 	prompt := buildPrompt(text, difficulty)
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey
+
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=" + apiKey
 
 	payload := map[string]any{
 		"contents": []map[string]any{
-			{"parts": []map[string]any{{"text": prompt}}},
+			{
+				"parts": []map[string]any{
+					{
+						"text": prompt,
+					},
+				},
+			},
 		},
 		"generationConfig": map[string]any{
-			"temperature":     0.7,
 			"maxOutputTokens": 8192,
 		},
 	}
+
 	body, _ := json.Marshal(payload)
 
 	client := &http.Client{Timeout: 120 * time.Second}
+
 	var resp *http.Response
 	var respBody []byte
 
