@@ -13,8 +13,29 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+func loadEnv(path string) error {
+	contents, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	values, err := godotenv.Unmarshal(strings.TrimPrefix(string(contents), "\uFEFF"))
+	if err != nil {
+		return err
+	}
+
+	for key, value := range values {
+		if os.Getenv(key) == "" {
+			if err := os.Setenv(key, value); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func main() {
-	if err := godotenv.Load(".env"); err != nil {
+	if err := loadEnv(".env"); err != nil {
 		log.Printf("❌ ОШИБКА ЗАГРУЗКИ .env: %v", err)
 	} else {
 		log.Println("✅ .env успешно загружен")
