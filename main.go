@@ -14,8 +14,10 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("ℹ️  .env файл табылмады — жүйе айнымалыларын қолданамыз")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Printf("❌ ОШИБКА ЗАГРУЗКИ .env: %v", err)
+	} else {
+		log.Println("✅ .env успешно загружен")
 	}
 
 	if err := validateEnv(); err != nil {
@@ -98,14 +100,14 @@ func main() {
 	mux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	// ── CORS ──────────────────────────────────────────────────────────────────
-origins := []string{
-    "http://127.0.0.1:3001",
-    "http://localhost:3001",
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
-    "http://127.0.0.1:8080",
-    "http://localhost:8080",
-}
+	origins := []string{
+		"http://127.0.0.1:3001",
+		"http://localhost:3001",
+		"http://127.0.0.1:3000",
+		"http://localhost:3000",
+		"http://127.0.0.1:8080",
+		"http://localhost:8080",
+	}
 
 	handler := corsMiddleware(origins, mux)
 
