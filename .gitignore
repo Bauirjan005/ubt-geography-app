@@ -1,5 +1,36 @@
-ubt.db
-ubt-prep-app.exe
-ubt-app.exe
-.exe
+# Secrets & Environment variables
 .env
+.env.*
+*.env
+
+# SQLite Database & transaction logs
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+ubt.db
+ubt.db*
+
+# User uploaded materials
+uploads/*
+!uploads/.gitkeep
+
+# Compiled binaries & build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+ubt-app
+ubt-app.exe
+ubt-prep-app.exe
+server
+
+# OS & Editor temporary files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.log

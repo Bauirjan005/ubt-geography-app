@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ubt-geography-app
+    runtime: go
+    plan: free
+    region: frankfurt
+    buildCommand: go build -o server .
+    startCommand: ./server
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

@@ -36,7 +36,11 @@ func loadEnv(path string) error {
 
 func main() {
 	if err := loadEnv(".env"); err != nil {
-		log.Printf("❌ ОШИБКА ЗАГРУЗКИ .env: %v", err)
+		if os.IsNotExist(err) {
+			log.Println("ℹ️ .env файлы табылмады (жүйелік айнымалылар қолданылады)")
+		} else {
+			log.Printf("⚠️ .env жүктеу: %v", err)
+		}
 	} else {
 		log.Println("✅ .env успешно загружен")
 	}
@@ -138,8 +142,14 @@ func main() {
 
 	handler := corsMiddleware(origins, mux)
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3001"
+	}
+	addr := "0.0.0.0:" + port
+
 	server := &http.Server{
-		Addr:           "127.0.0.1:3001",
+		Addr:           addr,
 		Handler:        handler,
 		ReadTimeout:    120 * time.Second,
 		WriteTimeout:   120 * time.Second,
@@ -147,7 +157,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Println("✅ UBT сервері іске қосылды → http://127.0.0.1:3001")
+	log.Printf("✅ UBT сервері іске қосылды → http://%s (порт: %s)", addr, port)
 	log.Fatal(server.ListenAndServe())
 }
 
@@ -176,14 +186,24 @@ func validateEnv() error {
 func corsMiddleware(allowedOrigins []string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
-		for _, o := range allowedOrigins {
-			if o == origin {
+		if origin != "" {
+			allowed := false
+			for _, o := range allowedOrigins {
+				if o == origin {
+					allowed = true
+					break
+				}
+			}
+			if !allowed && (strings.HasSuffix(origin, ".onrender.com") ||
+				origin == "https://"+r.Host || origin == "http://"+r.Host) {
+				allowed = true
+			}
+			if allowed {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 				w.Header().Set("Vary", "Origin")
-				break
 			}
 		}
 		if r.Method == http.MethodOptions {

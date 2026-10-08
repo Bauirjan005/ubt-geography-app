@@ -212,13 +212,14 @@ func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
 		// Secure    — only sent over HTTPS. Set to false in local dev only.
 		// SameSite  — Strict prevents the cookie being sent on cross-site
 		//             requests (CSRF protection).
+		isSecure := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_id",
 			Value:    sessionID,
 			Path:     "/",
 			HttpOnly: true,
-			Secure:   false,                // true только для HTTPS
-			SameSite: http.SameSiteLaxMode, // Lax — для разработки на localhost
+			Secure:   isSecure,
+			SameSite: http.SameSiteLaxMode,
 			MaxAge:   60 * 60 * 24 * 7,
 		})
 
@@ -242,14 +243,15 @@ func handleLogout(sessions *SessionStore) http.HandlerFunc {
 			sessions.Delete(cookie.Value)
 		}
 
+		isSecure := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
 		// Expire the cookie immediately by setting MaxAge = -1
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_id",
 			Value:    "",
 			Path:     "/",
 			HttpOnly: true,
-			Secure:   true,
-			SameSite: http.SameSiteStrictMode,
+			Secure:   isSecure,
+			SameSite: http.SameSiteLaxMode,
 			MaxAge:   -1,
 		})
 
