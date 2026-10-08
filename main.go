@@ -118,7 +118,13 @@ func main() {
 	RegisterStudentRoutes(mux, db, sessions)
 
 	// ── Static files ──────────────────────────────────────────────────────────
-	mux.Handle("/", http.FileServer(http.Dir("./static")))
+	staticFS := http.FileServer(http.Dir("./static"))
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		staticFS.ServeHTTP(w, r)
+	}))
 
 	// ── CORS ──────────────────────────────────────────────────────────────────
 	origins := []string{

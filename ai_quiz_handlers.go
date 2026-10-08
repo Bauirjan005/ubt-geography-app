@@ -78,7 +78,7 @@ func prepareText(fileData []byte, fileType string) string {
 }
 
 func buildPrompt(text, difficulty string) string {
-	n := 60
+	n := 15
 	diffDesc := map[string]string{
 		"easy":   "basic facts and simple definitions",
 		"medium": "applying concepts and understanding connections",
@@ -116,8 +116,41 @@ func parseQuestions(raw string) ([]rawAIQuestion, error) {
 	start := strings.Index(raw, "[")
 	end := strings.LastIndex(raw, "]")
 	if start != -1 && end != -1 && end > start {
-		raw = raw[start : end+1]
+		cleanJSON := raw[start : end+1]
+		var questions []rawAIQuestion
+		if err := json.Unmarshal([]byte(cleanJSON), &questions); err == nil && len(questions) > 0 && questions[0].Text != "" {
+			return questions, nil
+		}
 	}
+
+	// Auto-recovery if output was truncated mid-way:
+	if start != -1 {
+		content := strings.TrimSpace(raw[start:])
+		// 1. Try closing open quote / brace / bracket
+		suffixes := []string{
+			"",
+			"]",
+			"\"}]",
+			"}]",
+		}
+		for _, suf := range suffixes {
+			var questions []rawAIQuestion
+			if err := json.Unmarshal([]byte(content+suf), &questions); err == nil && len(questions) > 0 && questions[0].Text != "" {
+				return questions, nil
+			}
+		}
+
+		// 2. Cut at last complete question object "}"
+		lastBrace := strings.LastIndex(content, "}")
+		if lastBrace > 0 {
+			salvaged := content[:lastBrace+1] + "]"
+			var questions []rawAIQuestion
+			if err := json.Unmarshal([]byte(salvaged), &questions); err == nil && len(questions) > 0 && questions[0].Text != "" {
+				return questions, nil
+			}
+		}
+	}
+
 	var questions []rawAIQuestion
 	if err := json.Unmarshal([]byte(raw), &questions); err != nil {
 		return nil, fmt.Errorf("JSON parse error: %w\nRaw: %.300s", err, raw)
@@ -141,7 +174,8 @@ func callGemini(apiKey, text, difficulty string) ([]rawAIQuestion, error) {
 			},
 		},
 		"generationConfig": map[string]any{
-			"maxOutputTokens": 8192,
+			"maxOutputTokens":  8192,
+			"responseMimeType": "application/json",
 		},
 	}
 
@@ -367,6 +401,7 @@ func handleGenerateAIQuiz(db *sql.DB) http.HandlerFunc {
 
 		for i, q := range questions {
 			correct := strings.ToUpper(strings.TrimSpace(q.CorrectOption))
+			correct = strings.TrimPrefix(correct, "OPTION_")
 			if correct != "A" && correct != "B" && correct != "C" && correct != "D" {
 				correct = "A"
 			}
