@@ -681,6 +681,234 @@
       .preview-options-grid { grid-template-columns: 1fr; }
     }
 
+    /* ── Student Results & Analytics Section ────────────────────────────── */
+    .res-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .res-stat-card {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .res-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(2,132,199,0.08);
+    }
+    .res-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .res-stat-val {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .res-stat-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    /* Sub-tabs */
+    .res-subtabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1.5px solid var(--border);
+      margin-bottom: 18px;
+      padding-bottom: 2px;
+    }
+    .res-tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      transition: all .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .res-tab-btn:hover {
+      color: var(--forest);
+      background: rgba(13,94,56,0.04);
+    }
+    .res-tab-btn.active {
+      color: var(--forest);
+      border-bottom: 2.5px solid var(--forest);
+      background: #fff;
+    }
+
+    /* Table */
+    .res-table-wrap {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow-x: auto;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+    }
+    .res-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .res-table th {
+      background: #f8fafc;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+    .res-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+    .res-table tr:last-child td {
+      border-bottom: none;
+    }
+    .res-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .res-user-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .res-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7 0%, #0d5e38 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .res-name {
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .res-email {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .res-test-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-right: 6px;
+    }
+    .res-test-tag.ai { background: #e0f2fe; color: #0369a1; }
+    .res-test-tag.lesson { background: #dcfce7; color: #15803d; }
+
+    .score-pill-grade {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .score-grade-high { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .score-grade-mid  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .score-grade-low  { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+    .res-score-progress {
+      width: 90px;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .res-score-progress-bar {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* Leaderboard Grid */
+    .leader-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .leader-card {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all .2s;
+      position: relative;
+    }
+    .leader-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(2,132,199,0.08);
+      border-color: #38bdf8;
+    }
+    .leader-rank-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: var(--parchment);
+      color: var(--ink);
+    }
+    .leader-rank-1 { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+    .leader-rank-2 { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .leader-rank-3 { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+
   </style>
 </head>
 <body>
@@ -748,6 +976,7 @@
     <button class="nav-btn" onclick="showTab('questions')"><span>❓</span> Сұрақ қосу</button>
     <button class="nav-btn" onclick="showTab('materials')"><span>📁</span> Материалдар</button>
     <button class="nav-btn" onclick="showTab('aiquizzes')"><span>🤖</span> Тесты ИИ <span id="nav-ai-badge" class="status-badge status-published" style="display:none;margin-left:auto;padding:1px 7px;font-size:10px">0</span></button>
+    <button class="nav-btn" onclick="showTab('results')"><span>📊</span> Оқушылар нәтижелері <span id="nav-results-badge" class="status-badge status-ready" style="display:none;margin-left:auto;padding:1px 7px;font-size:10px">0</span></button>
     <div class="divider"></div>
     <div class="aside-sub">Менің сабақтарым</div>
     <div class="chips" id="lesson-chips"><div style="font-size:12px;color:var(--muted);padding:4px 10px">Жоқ</div></div>
@@ -908,6 +1137,127 @@
         </div>
       </div>
     </div>
+
+    <!-- TAB 5: Student Results & Analytics -->
+    <div id="tab-results" style="display:none">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div>
+          <div class="page-eyebrow">ҰБТ География • Кабинет учителя</div>
+          <div class="page-title">Результаты учеников</div>
+          <div class="page-desc" style="margin-bottom:0">Оқушылардың тесттерді тапсыру барысы, баллдары мен білім сапасының толық мониторингі.</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" onclick="loadAllResults(true)" style="display:inline-flex;align-items:center;gap:6px">
+            <span>🔄</span> Жаңарту
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Analytics Row -->
+      <div class="res-stats-grid">
+        <div class="res-stat-card">
+          <div class="res-stat-icon" style="background:#e0f2fe;color:#0284c7">👥</div>
+          <div>
+            <div class="res-stat-val" id="res-stat-students">0</div>
+            <div class="res-stat-lbl">Оқушылар саны</div>
+          </div>
+        </div>
+        <div class="res-stat-card">
+          <div class="res-stat-icon" style="background:#f0fdf4;color:#166534">📝</div>
+          <div>
+            <div class="res-stat-val" id="res-stat-attempts">0</div>
+            <div class="res-stat-lbl">Жалпы тапсырыс</div>
+          </div>
+        </div>
+        <div class="res-stat-card">
+          <div class="res-stat-icon" style="background:#fef3c7;color:#b45309">📈</div>
+          <div>
+            <div class="res-stat-val" id="res-stat-avg">—</div>
+            <div class="res-stat-lbl">Орташа сапа %</div>
+          </div>
+        </div>
+        <div class="res-stat-card">
+          <div class="res-stat-icon" style="background:#dcfce7;color:#15803d">🌟</div>
+          <div>
+            <div class="res-stat-val" id="res-stat-high">0</div>
+            <div class="res-stat-lbl">Үздіктер (80%+)</div>
+          </div>
+        </div>
+        <div class="res-stat-card">
+          <div class="res-stat-icon" style="background:#fee2e2;color:#dc2626">⚠️</div>
+          <div>
+            <div class="res-stat-val" id="res-stat-low">0</div>
+            <div class="res-stat-lbl">Көмек қажет (<40%)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter toolbar -->
+      <div class="ai-toolbar" style="margin-bottom:16px">
+        <div class="ai-search-box">
+          <span class="ai-search-icon">🔍</span>
+          <input type="text" id="res-search-input" placeholder="Оқушының аты немесе email бойынша іздеу..." oninput="filterAllResults()"/>
+        </div>
+        <div class="ai-filter-group">
+          <div class="ai-filter-item">
+            <span>Түрі:</span>
+            <select id="res-filter-type" onchange="filterAllResults()">
+              <option value="all">Барлық тесттер</option>
+              <option value="ai_quiz">✦ ИИ тесттер</option>
+              <option value="lesson">📖 Сабақ тесттері</option>
+            </select>
+          </div>
+          <div class="ai-filter-item">
+            <span>Нақты тест:</span>
+            <select id="res-filter-test" onchange="filterAllResults()">
+              <option value="all">Барлық атаулар</option>
+            </select>
+          </div>
+          <div class="ai-filter-item">
+            <span>Балл:</span>
+            <select id="res-filter-grade" onchange="filterAllResults()">
+              <option value="all">Барлық баллдар</option>
+              <option value="high">🟢 Үздік (80-100%)</option>
+              <option value="mid">🟡 Жақсы / Орта (40-79%)</option>
+              <option value="low">🔴 Төмен (<40%)</option>
+            </select>
+          </div>
+          <div class="ai-filter-item">
+            <span>Сұрыптау:</span>
+            <select id="res-filter-sort" onchange="filterAllResults()">
+              <option value="newest">Ең соңғысы</option>
+              <option value="highest">Жоғары балл</option>
+              <option value="lowest">Төмен балл</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs: Feed vs Leaderboard -->
+      <div class="res-subtabs">
+        <button class="res-tab-btn active" id="btn-view-feed" onclick="switchResultsView('feed')">
+          <span>📋</span> Барлық тапсырыстар тізімі
+        </button>
+        <button class="res-tab-btn" id="btn-view-leaderboard" onclick="switchResultsView('leaderboard')">
+          <span>🏆</span> Оқушылар рейтингі (Лидерборд)
+        </button>
+      </div>
+
+      <!-- Container: Feed or Leaderboard -->
+      <div id="results-view-feed">
+        <div class="res-table-wrap" id="res-feed-container">
+          <div style="font-size:13px;color:var(--muted);text-align:center;padding:40px">
+            <span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Нәтижелер жүктелуде...
+          </div>
+        </div>
+      </div>
+
+      <div id="results-view-leaderboard" style="display:none">
+        <div id="res-leaderboard-container">
+          <!-- Leaderboard cards -->
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -1023,6 +1373,60 @@
   </div>
 </div>
 
+<!-- Student Profile & Test History Modal -->
+<div class="modal-overlay" id="student-profile-modal" style="display:none" onclick="if(event.target===this)closeStudentModal()">
+  <div class="modal" style="width:min(780px,96vw)">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="res-avatar" id="sp-avatar" style="width:46px;height:46px;font-size:18px">?</div>
+        <div>
+          <div class="modal-title" id="sp-name">Оқушы аты</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" id="sp-email">email@mail.com</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeStudentModal()">×</button>
+    </div>
+    <div style="max-height:68vh;overflow-y:auto;padding-right:4px">
+      <!-- Student mini-stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+        <div class="card" style="padding:14px;text-align:center;margin-bottom:0">
+          <div style="font-family:var(--serif);font-size:24px;color:var(--forest)" id="sp-stat-count">0</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Тапсырылған тест</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center;margin-bottom:0">
+          <div style="font-family:var(--serif);font-size:24px;color:var(--ocean)" id="sp-stat-avg">0%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Орташа балл</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center;margin-bottom:0">
+          <div style="font-family:var(--serif);font-size:24px;color:var(--success)" id="sp-stat-best">0%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Үздік нәтиже</div>
+        </div>
+      </div>
+
+      <!-- History table -->
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px">📜 Тест тапсыру тарихы</div>
+      <div class="res-table-wrap">
+        <table class="res-table">
+          <thead>
+            <tr>
+              <th>Тест атауы</th>
+              <th>Балл</th>
+              <th>Нәтиже</th>
+              <th>Уақыты</th>
+            </tr>
+          </thead>
+          <tbody id="sp-history-tbody">
+            <!-- populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn btn-secondary" onclick="closeStudentModal()">Жабу</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1054,7 +1458,7 @@ checkAuth().then(user => { if (user && typeof init === 'function') init(); });
 // ── State ──────────────────────────────────────────────────────────────────────
 let lessons = [], activeLessonId = null, qCount = 0, materials = [];
 
-function init() { fetchLessons(); addQuestion(); loadMaterials(); loadAIQuizzes(); }
+function init() { fetchLessons(); addQuestion(); loadMaterials(); loadAIQuizzes(); loadAllResults(); }
 
 // ── Lessons ────────────────────────────────────────────────────────────────────
 async function fetchLessons() {
@@ -2043,11 +2447,374 @@ function selectLesson(id, title) {
 
 // ── Tab switching ──────────────────────────────────────────────────────────────
 function showTab(name) {
-  const tabs = ['lessons','questions','materials','aiquizzes'];
-  tabs.forEach(t => { document.getElementById(`tab-${t}`).style.display = t===name?'':'none'; });
+  const tabs = ['lessons','questions','materials','aiquizzes','results'];
+  tabs.forEach(t => { 
+    const el = document.getElementById(`tab-${t}`);
+    if (el) el.style.display = t===name?'':'none'; 
+  });
   document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', tabs[i]===name));
   if (name === 'materials') loadMaterials();
   if (name === 'aiquizzes') loadAIQuizzes();
+  if (name === 'results') loadAllResults();
+}
+
+// ── Student Results & Analytics State ──────────────────────────────────────────
+let allResultsData = {
+  attempts: [],
+  stats: {},
+  top_students: [],
+  available_tests: []
+};
+let currentResultsView = 'feed'; // 'feed' or 'leaderboard'
+
+async function loadAllResults(isManual = false) {
+  const feedContainer = document.getElementById('res-feed-container');
+  if (!feedContainer && !isManual) return;
+  try {
+    const res = await fetch('/api/teacher/results');
+    if (!res.ok) {
+      if (feedContainer) feedContainer.innerHTML = '<div style="color:var(--danger);padding:30px;text-align:center">Нәтижелерді жүктеу сәтсіз аяқталды</div>';
+      return;
+    }
+    allResultsData = await res.json();
+    updateResultsStats(allResultsData.stats || {});
+    populateAvailableTestsDropdown(allResultsData.available_tests || []);
+    filterAllResults();
+    if (isManual) toast('Нәтижелер жаңартылды ✓', 'ok');
+  } catch (err) {
+    if (feedContainer) feedContainer.innerHTML = '<div style="color:var(--danger);padding:30px;text-align:center">Сервермен байланыс қатесі</div>';
+  }
+}
+
+function updateResultsStats(stats) {
+  const elStudents = document.getElementById('res-stat-students');
+  const elAttempts = document.getElementById('res-stat-attempts');
+  const elAvg = document.getElementById('res-stat-avg');
+  const elHigh = document.getElementById('res-stat-high');
+  const elLow = document.getElementById('res-stat-low');
+  const navBadge = document.getElementById('nav-results-badge');
+
+  if (elStudents) elStudents.textContent = stats.unique_students ?? 0;
+  if (elAttempts) elAttempts.textContent = stats.total_attempts ?? 0;
+  if (elAvg) elAvg.textContent = stats.total_attempts > 0 ? (stats.avg_percent + '%') : '—';
+  if (elHigh) elHigh.textContent = stats.high_scores ?? 0;
+  if (elLow) elLow.textContent = stats.low_scores ?? 0;
+
+  if (navBadge) {
+    const total = stats.total_attempts ?? 0;
+    if (total > 0) {
+      navBadge.style.display = 'inline-flex';
+      navBadge.textContent = total;
+    } else {
+      navBadge.style.display = 'none';
+    }
+  }
+}
+
+function populateAvailableTestsDropdown(tests) {
+  const sel = document.getElementById('res-filter-test');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="all">Барлық атаулар</option>' + tests.map(t => {
+    const prefix = t.type === 'ai_quiz' ? '✦ ИИ: ' : '📖 Сабақ: ';
+    return `<option value="${t.type}_${t.id}">${prefix}${escapeHTML(t.title)}</option>`;
+  }).join('');
+  if (currentVal) sel.value = currentVal;
+}
+
+function switchResultsView(view) {
+  currentResultsView = view;
+  const btnFeed = document.getElementById('btn-view-feed');
+  const btnLeader = document.getElementById('btn-view-leaderboard');
+  const feedView = document.getElementById('results-view-feed');
+  const leaderView = document.getElementById('results-view-leaderboard');
+
+  if (btnFeed) btnFeed.classList.toggle('active', view === 'feed');
+  if (btnLeader) btnLeader.classList.toggle('active', view === 'leaderboard');
+  if (feedView) feedView.style.display = view === 'feed' ? 'block' : 'none';
+  if (leaderView) leaderView.style.display = view === 'leaderboard' ? 'block' : 'none';
+
+  filterAllResults();
+}
+
+function filterAllResults() {
+  const searchInput = document.getElementById('res-search-input');
+  const typeSelect = document.getElementById('res-filter-type');
+  const testSelect = document.getElementById('res-filter-test');
+  const gradeSelect = document.getElementById('res-filter-grade');
+  const sortSelect = document.getElementById('res-filter-sort');
+
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  const typeVal = typeSelect?.value || 'all';
+  const testVal = testSelect?.value || 'all';
+  const gradeVal = gradeSelect?.value || 'all';
+  const sortVal = sortSelect?.value || 'newest';
+
+  let attempts = (allResultsData.attempts || []).slice();
+
+  // Search by name or email
+  if (query) {
+    attempts = attempts.filter(a =>
+      (a.student_name && a.student_name.toLowerCase().includes(query)) ||
+      (a.student_email && a.student_email.toLowerCase().includes(query)) ||
+      (a.test_title && a.test_title.toLowerCase().includes(query))
+    );
+  }
+
+  // Filter by test type
+  if (typeVal !== 'all') {
+    attempts = attempts.filter(a => a.test_type === typeVal);
+  }
+
+  // Filter by specific test
+  if (testVal !== 'all') {
+    const parts = testVal.split('_');
+    const tType = parts[0];
+    const tId = Number(parts[1]);
+    attempts = attempts.filter(a => a.test_type === tType && a.test_id === tId);
+  }
+
+  // Filter by grade
+  if (gradeVal === 'high') {
+    attempts = attempts.filter(a => a.percent >= 80);
+  } else if (gradeVal === 'mid') {
+    attempts = attempts.filter(a => a.percent >= 40 && a.percent < 80);
+  } else if (gradeVal === 'low') {
+    attempts = attempts.filter(a => a.percent < 40);
+  }
+
+  // Sort
+  if (sortVal === 'highest') {
+    attempts.sort((a, b) => b.percent - a.percent);
+  } else if (sortVal === 'lowest') {
+    attempts.sort((a, b) => a.percent - b.percent);
+  } else {
+    // newest first
+    attempts.sort((a, b) => b.id - a.id);
+  }
+
+  renderResultsFeed(attempts);
+  renderLeaderboard(query);
+}
+
+function renderResultsFeed(attempts) {
+  const container = document.getElementById('res-feed-container');
+  if (!container) return;
+
+  if (!allResultsData.attempts || allResultsData.attempts.length === 0) {
+    container.innerHTML = `
+      <div class="ai-empty-state" style="border:none;margin:20px auto">
+        <div class="ai-empty-icon">📊</div>
+        <div class="ai-empty-title">Әзірге оқушылар тест тапсырмаған</div>
+        <p class="ai-empty-text">Оқушылар сіздің сабақтарыңыз бен ИИ тесттеріңізді тапсырған бойда, олардың барлық нәтижелері, баллдары мен тарихы осы жерде бірден көрінеді.</p>
+        <button class="btn btn-primary" onclick="showTab('aiquizzes')">ИИ тесттерге өту</button>
+      </div>`;
+    return;
+  }
+
+  if (attempts.length === 0) {
+    container.innerHTML = `
+      <div class="ai-empty-state" style="border:none;padding:30px 20px">
+        <div style="font-size:32px;margin-bottom:8px">🔍</div>
+        <div class="ai-empty-title" style="font-size:18px">Сәйкес келетін нәтижелер табылмады</div>
+        <p class="ai-empty-text">Іздеу сөзін немесе сүзгі параметрлерін өзгертіп көріңіз.</p>
+        <button class="btn btn-secondary" onclick="resetResultsFilters()">Сүзгілерді тазарту</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="res-table">
+      <thead>
+        <tr>
+          <th>Оқушы</th>
+          <th>Тест атауы</th>
+          <th>Балл</th>
+          <th>Нәтиже</th>
+          <th>Уақыты</th>
+          <th style="text-align:right">Әрекет</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${attempts.map(a => {
+          const pct = Math.round(a.percent);
+          const gradeCls = pct >= 80 ? 'score-grade-high' : pct >= 40 ? 'score-grade-mid' : 'score-grade-low';
+          const gradeTxt = pct >= 80 ? '🌟 Үздік' : pct >= 40 ? '👍 Жақсы' : '⚠️ Төмен';
+          const barColor = pct >= 80 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444';
+          const tagCls = a.test_type === 'ai_quiz' ? 'res-test-tag ai' : 'res-test-tag lesson';
+          const tagTxt = a.test_type === 'ai_quiz' ? '✦ ИИ' : '📖 Сабақ';
+          const initial = (a.student_name || 'U')[0].toUpperCase();
+
+          return `
+            <tr>
+              <td>
+                <div class="res-user-cell">
+                  <div class="res-avatar">${initial}</div>
+                  <div>
+                    <div class="res-name">${escapeHTML(a.student_name)}</div>
+                    <div class="res-email">${escapeHTML(a.student_email)}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <span class="${tagCls}">${tagTxt}</span>
+                  <span style="font-weight:600;color:var(--ink)">${escapeHTML(a.test_title)}</span>
+                </div>
+              </td>
+              <td>
+                <div style="font-weight:700;font-size:14px;color:var(--ink)">${a.score} / ${a.total}</div>
+                <div class="res-score-progress">
+                  <div class="res-score-progress-bar" style="width:${pct}%;background:${barColor}"></div>
+                </div>
+              </td>
+              <td>
+                <span class="score-pill-grade ${gradeCls}">${pct}% · ${gradeTxt}</span>
+              </td>
+              <td style="color:var(--muted);font-size:12px;white-space:nowrap">
+                ${a.completed_at}
+              </td>
+              <td style="text-align:right">
+                <button class="btn btn-secondary" onclick="openStudentModal(${a.student_id})" style="padding:5px 12px;font-size:12px">
+                  👁 Профиль
+                </button>
+              </td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderLeaderboard(query = '') {
+  const container = document.getElementById('res-leaderboard-container');
+  if (!container) return;
+
+  let top = (allResultsData.top_students || []).slice();
+  if (query) {
+    top = top.filter(s =>
+      (s.student_name && s.student_name.toLowerCase().includes(query)) ||
+      (s.student_email && s.student_email.toLowerCase().includes(query))
+    );
+  }
+
+  if (top.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px">Оқушылар табылмады</div>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="leader-grid">
+      ${top.map((s, idx) => {
+        const rankClass = idx === 0 ? 'leader-rank-1' : idx === 1 ? 'leader-rank-2' : idx === 2 ? 'leader-rank-3' : '';
+        const rankLabel = idx === 0 ? '🥇 1-орын' : idx === 1 ? '🥈 2-орын' : idx === 2 ? '🥉 3-орын' : `#${idx + 1}`;
+        const initial = (s.student_name || 'U')[0].toUpperCase();
+        const pct = Math.round(s.avg_percent);
+        const badgeCls = pct >= 80 ? 'score-grade-high' : pct >= 40 ? 'score-grade-mid' : 'score-grade-low';
+
+        return `
+          <div class="leader-card">
+            <span class="leader-rank-badge ${rankClass}">${rankLabel}</span>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="res-avatar" style="width:44px;height:44px;font-size:16px">${initial}</div>
+              <div style="overflow:hidden">
+                <div class="res-name" style="font-size:15px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${escapeHTML(s.student_name)}</div>
+                <div class="res-email" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${escapeHTML(s.student_email)}</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--parchment);padding:10px 12px;border-radius:10px;margin-top:4px">
+              <div>
+                <div style="font-size:11px;color:var(--muted)">Орташа балл</div>
+                <div style="font-weight:700;font-size:16px;color:var(--forest)">${pct}%</div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--muted)">Тапсырылған</div>
+                <div style="font-weight:700;font-size:16px;color:var(--ocean)">${s.attempts_count} тест</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px">
+              <span class="score-pill-grade ${badgeCls}">${pct >= 80 ? '🌟 Үздік' : pct >= 40 ? 'Жақсы' : 'Орта'}</span>
+              <button class="btn btn-secondary" onclick="openStudentModal(${s.student_id})" style="padding:4px 10px;font-size:11px">
+                Толығырақ →
+              </button>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function resetResultsFilters() {
+  const si = document.getElementById('res-search-input');
+  const ft = document.getElementById('res-filter-type');
+  const ftest = document.getElementById('res-filter-test');
+  const fg = document.getElementById('res-filter-grade');
+  const fs = document.getElementById('res-filter-sort');
+  if (si) si.value = '';
+  if (ft) ft.value = 'all';
+  if (ftest) ftest.value = 'all';
+  if (fg) fg.value = 'all';
+  if (fs) fs.value = 'newest';
+  filterAllResults();
+}
+
+// ── Student Detail Modal ───────────────────────────────────────────────────────
+async function openStudentModal(studentId) {
+  const modal = document.getElementById('student-profile-modal');
+  const tbody = document.getElementById('sp-history-tbody');
+  if (!modal || !tbody) return;
+
+  modal.style.display = 'flex';
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Жүктелуде...</td></tr>';
+
+  try {
+    const res = await fetch(`/api/teacher/students/${studentId}/results`);
+    if (!res.ok) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);padding:20px">Жүктеу сәтсіз аяқталды</td></tr>';
+      return;
+    }
+    const data = await res.json();
+    const student = data.student || {};
+    const stats = data.stats || {};
+    const attempts = data.attempts || [];
+
+    document.getElementById('sp-name').textContent = student.username || 'Оқушы';
+    document.getElementById('sp-email').textContent = student.email || '';
+    document.getElementById('sp-avatar').textContent = (student.username || 'U')[0].toUpperCase();
+
+    document.getElementById('sp-stat-count').textContent = stats.attempts_count ?? attempts.length;
+    document.getElementById('sp-stat-avg').textContent = Math.round(stats.avg_percent ?? 0) + '%';
+    document.getElementById('sp-stat-best').textContent = Math.round(stats.best_score ?? 0) + '%';
+
+    if (attempts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Әзірге тесттер тапсырылмаған</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = attempts.map(a => {
+      const pct = Math.round(a.percent);
+      const gradeCls = pct >= 80 ? 'score-grade-high' : pct >= 40 ? 'score-grade-mid' : 'score-grade-low';
+      const tagCls = a.test_type === 'ai_quiz' ? 'res-test-tag ai' : 'res-test-tag lesson';
+      const tagTxt = a.test_type === 'ai_quiz' ? '✦ ИИ' : '📖 Сабақ';
+
+      return `
+        <tr>
+          <td>
+            <span class="${tagCls}">${tagTxt}</span>
+            <strong>${escapeHTML(a.test_title)}</strong>
+          </td>
+          <td style="font-weight:600">${a.score} / ${a.total}</td>
+          <td><span class="score-pill-grade ${gradeCls}">${pct}%</span></td>
+          <td style="font-size:12px;color:var(--muted)">${a.completed_at}</td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);padding:20px">Сервермен байланыс жоқ</td></tr>';
+  }
+}
+
+function closeStudentModal() {
+  const modal = document.getElementById('student-profile-modal');
+  if (modal) modal.style.display = 'none';
 }
 
 // ── Utils ──────────────────────────────────────────────────────────────────────

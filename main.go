@@ -160,6 +160,25 @@ func main() {
 			}
 		})))
 
+	// ── Teacher: overall student results & student detail ─────────────────────
+	mux.Handle("/api/teacher/results", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodGet {
+				handleGetTeacherAllResults(db)(w, r)
+				return
+			}
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
+		})))
+
+	mux.Handle("/api/teacher/students/", tGuard(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasSuffix(r.URL.Path, "/results") && r.Method == http.MethodGet {
+				handleGetTeacherStudentDetail(db)(w, r)
+				return
+			}
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
+		})))
+
 	// ── Student: lessons + AI quizzes + materials ─────────────────────────────
 	// Барлығы student_handlers.go ішіндегі RegisterStudentRoutes арқылы тіркеледі
 	RegisterStudentRoutes(mux, db, sessions)
