@@ -128,19 +128,36 @@ func main() {
 			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
 		})))
 
-	// ── Teacher: AI quiz list + results ───────────────────────────────────────
+	// ── Teacher: AI quiz list + details + update + delete + status + results ──
 	mux.Handle("/api/teacher/ai-quizzes", tGuard(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			handleListTeacherAIQuizzes(db)(w, r)
+			if r.Method == http.MethodGet {
+				handleListTeacherAIQuizzes(db)(w, r)
+				return
+			}
+			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
 		})))
 
 	mux.Handle("/api/teacher/ai-quizzes/", tGuard(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasSuffix(r.URL.Path, "/results") {
+			if strings.HasSuffix(r.URL.Path, "/results") && r.Method == http.MethodGet {
 				handleGetAIQuizResults(db)(w, r)
 				return
 			}
-			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
+			if (strings.HasSuffix(r.URL.Path, "/publish") || strings.HasSuffix(r.URL.Path, "/status")) && (r.Method == http.MethodPost || r.Method == http.MethodPatch) {
+				handleUpdateAIQuizStatus(db)(w, r)
+				return
+			}
+			switch r.Method {
+			case http.MethodGet:
+				handleGetTeacherAIQuizDetail(db)(w, r)
+			case http.MethodPut:
+				handleUpdateTeacherAIQuiz(db)(w, r)
+			case http.MethodDelete:
+				handleDeleteTeacherAIQuiz(db)(w, r)
+			default:
+				writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
+			}
 		})))
 
 	// ── Student: lessons + AI quizzes + materials ─────────────────────────────

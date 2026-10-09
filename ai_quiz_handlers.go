@@ -390,7 +390,7 @@ func handleGenerateAIQuiz(db *DB) http.HandlerFunc {
 		defer tx.Rollback()
 
 		quizID, err := tx.InsertReturningID(
-			`INSERT INTO ai_quizzes (material_id, teacher_id, title, difficulty, created_at) VALUES (?, ?, ?, ?, ?)`,
+			`INSERT INTO ai_quizzes (material_id, teacher_id, title, difficulty, status, created_at) VALUES (?, ?, ?, ?, 'published', ?)`,
 			materialID, sess.UserID, req.Title, req.Difficulty, time.Now().UTC(),
 		)
 		if err != nil {
@@ -432,7 +432,8 @@ func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 		rows, err := db.Query(`
-			SELECT aq.id, aq.title, aq.difficulty, m.title,
+			SELECT aq.id, aq.title, aq.difficulty, COALESCE(aq.status, 'published'),
+			       m.id, m.title,
 			       COUNT(DISTINCT aqu.id),
 			       COUNT(DISTINCT att.id),
 			       COALESCE(AVG(CAST(att.score AS FLOAT) / NULLIF(att.total,0) * 100), 0),
@@ -442,7 +443,7 @@ func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 			LEFT JOIN ai_questions aqu ON aqu.quiz_id = aq.id
 			LEFT JOIN ai_quiz_attempts att ON att.quiz_id = aq.id
 			WHERE aq.teacher_id = ?
-			GROUP BY aq.id, aq.title, aq.difficulty, m.title, aq.created_at
+			GROUP BY aq.id, aq.title, aq.difficulty, aq.status, m.id, m.title, aq.created_at
 			ORDER BY aq.created_at DESC
 		`, sess.UserID)
 		if err != nil {
@@ -455,6 +456,8 @@ func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 			ID            int64   `json:"id"`
 			Title         string  `json:"title"`
 			Difficulty    string  `json:"difficulty"`
+			Status        string  `json:"status"`
+			MaterialID    int64   `json:"material_id"`
 			MaterialTitle string  `json:"material_title"`
 			QuestionCount int     `json:"question_count"`
 			AttemptCount  int     `json:"attempt_count"`
@@ -465,11 +468,12 @@ func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 		for rows.Next() {
 			var it Item
 			var ca time.Time
-			if err := rows.Scan(&it.ID, &it.Title, &it.Difficulty, &it.MaterialTitle,
+			if err := rows.Scan(&it.ID, &it.Title, &it.Difficulty, &it.Status,
+				&it.MaterialID, &it.MaterialTitle,
 				&it.QuestionCount, &it.AttemptCount, &it.AvgPercent, &ca); err != nil {
 				continue
 			}
-			it.CreatedAt = ca.Format("2006-01-02")
+			it.CreatedAt = ca.Format("02.01.2006")
 			list = append(list, it)
 		}
 		if list == nil {
@@ -479,14 +483,291 @@ func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 	}
 }
 
+// GET /api/teacher/ai-quizzes/{id}
+func handleGetTeacherAIQuizDetail(db *DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sess := SessionFromContext(r)
+		quizID, err := parseTeacherQuizID(r.URL.Path)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid quiz ID"})
+			return
+		}
+
+		var (
+			title, difficulty, status, matTitle string
+			matID                               int64
+			createdAt                           time.Time
+			ownerID                             int64
+		)
+		err = db.QueryRow(`
+			SELECT aq.teacher_id, aq.title, aq.difficulty, COALESCE(aq.status, 'published'),
+			       aq.material_id, m.title, aq.created_at
+			FROM ai_quizzes aq
+			JOIN materials m ON m.id = aq.material_id
+			WHERE aq.id = ?
+		`, quizID).Scan(&ownerID, &title, &difficulty, &status, &matID, &matTitle, &createdAt)
+
+		if err == sql.ErrNoRows {
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "quiz not found"})
+			return
+		}
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "database error"})
+			return
+		}
+		if ownerID != sess.UserID {
+			writeJSON(w, http.StatusForbidden, map[string]string{"message": "access denied"})
+			return
+		}
+
+		rows, err := db.Query(`
+			SELECT id, position, text, option_a, option_b, option_c, option_d, correct_option, COALESCE(explanation, '')
+			FROM ai_questions
+			WHERE quiz_id = ?
+			ORDER BY position ASC, id ASC
+		`, quizID)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "database error"})
+			return
+		}
+		defer rows.Close()
+
+		type QuestionItem struct {
+			ID            int64  `json:"id"`
+			Position      int    `json:"position"`
+			Text          string `json:"text"`
+			OptionA       string `json:"option_a"`
+			OptionB       string `json:"option_b"`
+			OptionC       string `json:"option_c"`
+			OptionD       string `json:"option_d"`
+			CorrectOption string `json:"correct_option"`
+			Explanation   string `json:"explanation"`
+		}
+		var questions []QuestionItem
+		for rows.Next() {
+			var q QuestionItem
+			if err := rows.Scan(&q.ID, &q.Position, &q.Text, &q.OptionA, &q.OptionB, &q.OptionC, &q.OptionD, &q.CorrectOption, &q.Explanation); err != nil {
+				continue
+			}
+			questions = append(questions, q)
+		}
+		if questions == nil {
+			questions = []QuestionItem{}
+		}
+
+		writeJSON(w, http.StatusOK, map[string]any{
+			"quiz": map[string]any{
+				"id":             quizID,
+				"title":          title,
+				"difficulty":     difficulty,
+				"status":         status,
+				"material_id":    matID,
+				"material_title": matTitle,
+				"created_at":     createdAt.Format("02.01.2006 15:04"),
+				"questions":      questions,
+			},
+		})
+	}
+}
+
+// PUT /api/teacher/ai-quizzes/{id}
+func handleUpdateTeacherAIQuiz(db *DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sess := SessionFromContext(r)
+		quizID, err := parseTeacherQuizID(r.URL.Path)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid quiz ID"})
+			return
+		}
+
+		var ownerID int64
+		if err := db.QueryRow(`SELECT teacher_id FROM ai_quizzes WHERE id = ?`, quizID).Scan(&ownerID); err != nil {
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "quiz not found"})
+			return
+		}
+		if ownerID != sess.UserID {
+			writeJSON(w, http.StatusForbidden, map[string]string{"message": "access denied"})
+			return
+		}
+
+		type QuestionInput struct {
+			Text          string `json:"text"`
+			OptionA       string `json:"option_a"`
+			OptionB       string `json:"option_b"`
+			OptionC       string `json:"option_c"`
+			OptionD       string `json:"option_d"`
+			CorrectOption string `json:"correct_option"`
+			Explanation   string `json:"explanation"`
+		}
+		var req struct {
+			Title      string          `json:"title"`
+			Difficulty string          `json:"difficulty"`
+			Status     string          `json:"status"`
+			Questions  []QuestionInput `json:"questions"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid JSON"})
+			return
+		}
+
+		req.Title = strings.TrimSpace(req.Title)
+		if req.Title == "" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "title is required"})
+			return
+		}
+		if req.Difficulty != "easy" && req.Difficulty != "medium" && req.Difficulty != "hard" {
+			req.Difficulty = "medium"
+		}
+		if req.Status != "draft" && req.Status != "published" && req.Status != "ready" {
+			req.Status = "published"
+		}
+		if len(req.Questions) == 0 {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "at least one question required"})
+			return
+		}
+
+		tx, err := db.Begin()
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "database error"})
+			return
+		}
+		defer tx.Rollback()
+
+		_, err = tx.Exec(`
+			UPDATE ai_quizzes SET title = ?, difficulty = ?, status = ? WHERE id = ?
+		`, req.Title, req.Difficulty, req.Status, quizID)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to update quiz"})
+			return
+		}
+
+		if _, err := tx.Exec(`DELETE FROM ai_questions WHERE quiz_id = ?`, quizID); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to clear questions"})
+			return
+		}
+
+		for i, q := range req.Questions {
+			q.Text = strings.TrimSpace(q.Text)
+			q.OptionA = strings.TrimSpace(q.OptionA)
+			q.OptionB = strings.TrimSpace(q.OptionB)
+			q.OptionC = strings.TrimSpace(q.OptionC)
+			q.OptionD = strings.TrimSpace(q.OptionD)
+			correct := strings.ToUpper(strings.TrimSpace(q.CorrectOption))
+			if correct != "A" && correct != "B" && correct != "C" && correct != "D" {
+				correct = "A"
+			}
+			_, err = tx.Exec(`
+				INSERT INTO ai_questions (quiz_id, position, text, option_a, option_b, option_c, option_d, correct_option, explanation)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			`, quizID, i+1, q.Text, q.OptionA, q.OptionB, q.OptionC, q.OptionD, correct, strings.TrimSpace(q.Explanation))
+			if err != nil {
+				writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to save question"})
+				return
+			}
+		}
+
+		if err := tx.Commit(); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "commit failed"})
+			return
+		}
+
+		writeJSON(w, http.StatusOK, map[string]any{
+			"message":        "quiz updated successfully",
+			"question_count": len(req.Questions),
+		})
+	}
+}
+
+// POST or PATCH /api/teacher/ai-quizzes/{id}/publish or .../status
+func handleUpdateAIQuizStatus(db *DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sess := SessionFromContext(r)
+		quizID, err := parseTeacherQuizID(r.URL.Path)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid quiz ID"})
+			return
+		}
+
+		var ownerID int64
+		var currentStatus string
+		if err := db.QueryRow(`SELECT teacher_id, COALESCE(status, 'published') FROM ai_quizzes WHERE id = ?`, quizID).Scan(&ownerID, &currentStatus); err != nil {
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "quiz not found"})
+			return
+		}
+		if ownerID != sess.UserID {
+			writeJSON(w, http.StatusForbidden, map[string]string{"message": "access denied"})
+			return
+		}
+
+		newStatus := "published"
+		if strings.HasSuffix(r.URL.Path, "/publish") {
+			if currentStatus == "published" {
+				newStatus = "draft"
+			} else {
+				newStatus = "published"
+			}
+		} else {
+			var body struct {
+				Status string `json:"status"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err == nil && body.Status != "" {
+				newStatus = body.Status
+			}
+		}
+		if newStatus != "draft" && newStatus != "published" && newStatus != "ready" {
+			newStatus = "published"
+		}
+
+		_, err = db.Exec(`UPDATE ai_quizzes SET status = ? WHERE id = ?`, newStatus, quizID)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "database error"})
+			return
+		}
+
+		writeJSON(w, http.StatusOK, map[string]any{
+			"message": "status updated",
+			"status":  newStatus,
+		})
+	}
+}
+
+// DELETE /api/teacher/ai-quizzes/{id}
+func handleDeleteTeacherAIQuiz(db *DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sess := SessionFromContext(r)
+		quizID, err := parseTeacherQuizID(r.URL.Path)
+		if err != nil {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid quiz ID"})
+			return
+		}
+
+		var ownerID int64
+		if err := db.QueryRow(`SELECT teacher_id FROM ai_quizzes WHERE id = ?`, quizID).Scan(&ownerID); err != nil {
+			writeJSON(w, http.StatusNotFound, map[string]string{"message": "quiz not found"})
+			return
+		}
+		if ownerID != sess.UserID {
+			writeJSON(w, http.StatusForbidden, map[string]string{"message": "access denied"})
+			return
+		}
+
+		_, err = db.Exec(`DELETE FROM ai_quizzes WHERE id = ? AND teacher_id = ?`, quizID, sess.UserID)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to delete quiz"})
+			return
+		}
+
+		writeJSON(w, http.StatusOK, map[string]string{
+			"message": "quiz deleted successfully",
+		})
+	}
+}
+
 // GET /api/teacher/ai-quizzes/{id}/results
 func handleGetAIQuizResults(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
-
-		path := strings.TrimSuffix(r.URL.Path, "/results")
-		parts := strings.Split(strings.TrimRight(path, "/"), "/")
-		quizID, err := strconv.ParseInt(parts[len(parts)-1], 10, 64)
+		quizID, err := parseTeacherQuizID(r.URL.Path)
 		if err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"message": "invalid quiz ID"})
 			return
@@ -542,16 +823,12 @@ func handleGetAIQuizResults(db *DB) http.HandlerFunc {
 	}
 }
 
-func difficultyLabel(d string) string {
-	switch d {
-	case "easy":
-		return "Zhengil"
-	case "medium":
-		return "Orta"
-	case "hard":
-		return "Kiyn"
-	}
-	return d
+func parseTeacherQuizID(path string) (int64, error) {
+	clean := strings.TrimSuffix(path, "/results")
+	clean = strings.TrimSuffix(clean, "/publish")
+	clean = strings.TrimSuffix(clean, "/status")
+	parts := strings.Split(strings.TrimRight(clean, "/"), "/")
+	return strconv.ParseInt(parts[len(parts)-1], 10, 64)
 }
 
 func parseAIQuizID(path string) (int64, error) {

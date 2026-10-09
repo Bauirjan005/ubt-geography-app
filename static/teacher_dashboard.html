@@ -148,12 +148,538 @@
     ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
     .readers-panel {
-  background: var(--parchment);
-  border-radius: 8px;
-  padding: 0 12px 12px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border);
-}
+      background: var(--parchment);
+      border-radius: 8px;
+      padding: 0 12px 12px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── AI Quizzes Styles & Modern UI ─────────────────────────────────────── */
+    .ai-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .ai-stat-card {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.03);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .ai-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(2,132,199,0.08);
+    }
+    .ai-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ai-stat-val {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .ai-stat-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    /* Toolbar: Search, Filters & Action */
+    .ai-toolbar {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.02);
+    }
+    .ai-search-box {
+      flex: 1 1 260px;
+      position: relative;
+    }
+    .ai-search-box input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--parchment);
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      transition: all .2s;
+    }
+    .ai-search-box input:focus {
+      border-color: var(--ocean);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(2,132,199,0.12);
+    }
+    .ai-search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .ai-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ai-filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .ai-filter-item select {
+      background: var(--parchment);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .ai-filter-item select:focus {
+      border-color: var(--ocean);
+      background: #fff;
+    }
+
+    /* Cards Grid */
+    .ai-quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .ai-quiz-card {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 3px 10px rgba(15,23,42,0.03);
+      transition: all .22s ease;
+      position: relative;
+    }
+    .ai-quiz-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(2,132,199,0.1);
+    }
+    .ai-quiz-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ai-quiz-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+    .status-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .status-published {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    .status-published .dot { background: #16a34a; }
+    .status-draft {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+    .status-draft .dot { background: #d97706; }
+    .status-ready {
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+    }
+    .status-ready .dot { background: #0284c7; }
+
+    .ai-quiz-date {
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ai-quiz-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      margin: 2px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ai-quiz-mat {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--parchment);
+      padding: 7px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ai-quiz-mat strong {
+      color: var(--forest);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ai-quiz-metrics {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--ink2);
+      flex-wrap: wrap;
+      padding: 8px 0 2px;
+      border-top: 1px dashed var(--border);
+    }
+    .ai-metric-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+    .ai-metric-item.score-good { color: #15803d; font-weight: 600; }
+    .ai-metric-item.score-mid  { color: #b45309; font-weight: 600; }
+    .ai-metric-item.score-low  { color: #dc2626; font-weight: 600; }
+
+    /* Action buttons in cards */
+    .ai-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: var(--parchment);
+      color: var(--ink2);
+      transition: all .15s;
+    }
+    .btn-card:hover {
+      background: #e2e8f0;
+      color: var(--ink);
+    }
+    .btn-card-preview {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+    .btn-card-preview:hover {
+      background: #0284c7;
+      color: #fff;
+      border-color: #0284c7;
+    }
+    .btn-card-edit {
+      background: #f1f5f9;
+      color: #334155;
+      border-color: #cbd5e1;
+    }
+    .btn-card-edit:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .btn-card-publish {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #bbf7d0;
+    }
+    .btn-card-publish:hover {
+      background: #16a34a;
+      color: #fff;
+      border-color: #16a34a;
+    }
+    .btn-card-unpublish {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+    .btn-card-unpublish:hover {
+      background: #d97706;
+      color: #fff;
+      border-color: #d97706;
+    }
+    .btn-card-results {
+      background: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+    .btn-card-results:hover {
+      background: #15803d;
+      color: #fff;
+    }
+    .btn-card-delete {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+      margin-left: auto;
+    }
+    .btn-card-delete:hover {
+      background: #dc2626;
+      color: #fff;
+      border-color: #dc2626;
+    }
+
+    /* Empty state */
+    .ai-empty-state {
+      background: var(--paper);
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      max-width: 600px;
+      margin: 30px auto;
+    }
+    .ai-empty-icon {
+      font-size: 52px;
+      margin-bottom: 14px;
+      display: inline-block;
+      animation: floatBot 3s ease-in-out infinite;
+    }
+    @keyframes floatBot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .ai-empty-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--forest);
+      margin-bottom: 8px;
+    }
+    .ai-empty-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 22px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Preview Modal Question Cards */
+    .preview-q-card {
+      background: var(--parchment);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .preview-q-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .preview-q-num {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ocean-l);
+      color: var(--ocean);
+      padding: 2px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .4px;
+    }
+    .preview-q-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .preview-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .preview-opt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--ink2);
+      transition: all .15s;
+    }
+    .preview-opt-letter {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: #e2e8f0;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .preview-opt.is-correct {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+      font-weight: 600;
+    }
+    .preview-opt.is-correct .preview-opt-letter {
+      background: #10b981;
+      color: #fff;
+    }
+    .preview-opt-badge {
+      margin-left: auto;
+      font-size: 11px;
+      background: #10b981;
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .preview-explanation {
+      background: #f0f9ff;
+      border-left: 3px solid #0284c7;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #0369a1;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    /* Edit Modal Questions */
+    .edit-q-block {
+      background: var(--parchment);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .edit-q-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .edit-q-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--forest);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .btn-remove-q {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all .15s;
+    }
+    .btn-remove-q:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .shell { grid-template-columns: 1fr; }
+      aside {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 16px;
+      }
+      aside .aside-label, aside .aside-sub, aside .divider, aside .chips {
+        display: none;
+      }
+      .nav-btn { width: auto; }
+      main { padding: 20px 16px; }
+      .ai-toolbar { flex-direction: column; align-items: stretch; }
+      .ai-filter-group { justify-content: space-between; }
+      .preview-options-grid { grid-template-columns: 1fr; }
+    }
 
   </style>
 </head>
@@ -221,7 +747,7 @@
     <button class="nav-btn active" onclick="showTab('lessons')"><span>📚</span> Сабақ жасау</button>
     <button class="nav-btn" onclick="showTab('questions')"><span>❓</span> Сұрақ қосу</button>
     <button class="nav-btn" onclick="showTab('materials')"><span>📁</span> Материалдар</button>
-    <button class="nav-btn" onclick="showTab('aiquizzes')"><span>🤖</span> ИИ тесттер</button>
+    <button class="nav-btn" onclick="showTab('aiquizzes')"><span>🤖</span> Тесты ИИ <span id="nav-ai-badge" class="status-badge status-published" style="display:none;margin-left:auto;padding:1px 7px;font-size:10px">0</span></button>
     <div class="divider"></div>
     <div class="aside-sub">Менің сабақтарым</div>
     <div class="chips" id="lesson-chips"><div style="font-size:12px;color:var(--muted);padding:4px 10px">Жоқ</div></div>
@@ -290,29 +816,96 @@
 
     <!-- TAB 4: AI Quizzes + Results -->
     <div id="tab-aiquizzes" style="display:none">
-      <div class="page-eyebrow">Мұғалім кабинеті</div>
-      <div class="page-title">ИИ тесттер және нәтижелер</div>
-      <div class="page-desc">Жасалған ИИ тесттер және оқушылардың нәтижелері.</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div>
+          <div class="page-eyebrow">ҰБТ География • Кабинет учителя</div>
+          <div class="page-title">Тесты, созданные ИИ</div>
+          <div class="page-desc" style="margin-bottom:0">Барлық жүктелген материалдар негізінде жасалған тесттер, оларды баптау және оқушыларға жариялау.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showTab('materials')" style="display:inline-flex;align-items:center;gap:8px">
+          <span>📁</span> Жаңа тест жасау (Материалдар)
+        </button>
+      </div>
 
       <!-- Summary stats -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-        <div class="card" style="padding:18px 20px;text-align:center;margin-bottom:0">
-          <div style="font-family:var(--serif);font-size:32px;color:var(--forest)" id="stat-total-quizzes">—</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">Барлық тест</div>
+      <div class="ai-stats-grid">
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon" style="background:#e0f2fe;color:#0284c7">🤖</div>
+          <div>
+            <div class="ai-stat-val" id="stat-total-quizzes">0</div>
+            <div class="ai-stat-lbl">Барлық тесттер</div>
+          </div>
         </div>
-        <div class="card" style="padding:18px 20px;text-align:center;margin-bottom:0">
-          <div style="font-family:var(--serif);font-size:32px;color:var(--ocean)" id="stat-total-attempts">—</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">Тапсырылды</div>
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon" style="background:#dcfce7;color:#15803d">✅</div>
+          <div>
+            <div class="ai-stat-val" id="stat-published-quizzes">0</div>
+            <div class="ai-stat-lbl">Опубликован</div>
+          </div>
         </div>
-        <div class="card" style="padding:18px 20px;text-align:center;margin-bottom:0">
-          <div style="font-family:var(--serif);font-size:32px;color:var(--earth-d)" id="stat-avg-score">—</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">Орташа балл %</div>
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon" style="background:#fef3c7;color:#b45309">📝</div>
+          <div>
+            <div class="ai-stat-val" id="stat-draft-quizzes">0</div>
+            <div class="ai-stat-lbl">Черновиктер</div>
+          </div>
+        </div>
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon" style="background:#f0fdf4;color:#166534">👥</div>
+          <div>
+            <div class="ai-stat-val" id="stat-total-attempts">0</div>
+            <div class="ai-stat-lbl">Тапсырылды</div>
+          </div>
+        </div>
+        <div class="ai-stat-card">
+          <div class="ai-stat-icon" style="background:#f1f5f9;color:#334155">🎯</div>
+          <div>
+            <div class="ai-stat-val" id="stat-avg-score">—</div>
+            <div class="ai-stat-lbl">Орташа балл</div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-head"><div class="step-circle">✦</div><div class="card-title">ИИ тесттер тізімі</div></div>
-        <div id="ai-quizzes-list"><div style="font-size:13px;color:var(--muted)">Жүктелуде...</div></div>
+      <!-- Toolbar: Search & Filters -->
+      <div class="ai-toolbar">
+        <div class="ai-search-box">
+          <span class="ai-search-icon">🔍</span>
+          <input type="text" id="ai-search-input" placeholder="Тест немесе материал атауы бойынша іздеу..." oninput="filterAIQuizzes()"/>
+        </div>
+        <div class="ai-filter-group">
+          <div class="ai-filter-item">
+            <span>Статус:</span>
+            <select id="ai-filter-status" onchange="filterAIQuizzes()">
+              <option value="all">Барлығы</option>
+              <option value="published">Опубликован</option>
+              <option value="draft">Черновик</option>
+            </select>
+          </div>
+          <div class="ai-filter-item">
+            <span>Деңгей:</span>
+            <select id="ai-filter-diff" onchange="filterAIQuizzes()">
+              <option value="all">Барлық деңгей</option>
+              <option value="easy">Жеңіл</option>
+              <option value="medium">Орташа</option>
+              <option value="hard">Қиын</option>
+            </select>
+          </div>
+          <div class="ai-filter-item">
+            <span>Сұрыптау:</span>
+            <select id="ai-filter-sort" onchange="filterAIQuizzes()">
+              <option value="newest">Ең жаңасы</option>
+              <option value="oldest">Ең ескісі</option>
+              <option value="questions">Сұрақ саны</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic list / Cards -->
+      <div id="ai-quizzes-list">
+        <div style="font-size:13px;color:var(--muted);text-align:center;padding:40px">
+          <span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Тесттер жүктелуде...
+        </div>
       </div>
     </div>
   </main>
@@ -326,6 +919,107 @@
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-overlay" id="preview-quiz-modal" style="display:none" onclick="if(event.target===this)closePreviewQuiz()">
+  <div class="modal" style="width:min(860px,96vw)">
+    <div class="modal-head" style="align-items:flex-start">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+          <span id="preview-modal-status" class="status-badge status-published"><span class="dot"></span> Опубликован</span>
+          <span id="preview-modal-diff" class="diff-badge diff-medium">🟡 Орта</span>
+          <span id="preview-modal-qcount" style="font-size:12px;color:var(--muted);font-weight:600">20 сұрақ</span>
+        </div>
+        <div class="modal-title" id="preview-modal-title">Тестті көру</div>
+        <div id="preview-modal-mat" style="font-size:12px;color:var(--muted);margin-top:3px"></div>
+      </div>
+      <button class="modal-close" onclick="closePreviewQuiz()">×</button>
+    </div>
+    <div id="preview-modal-body" style="max-height:65vh;overflow-y:auto;padding-right:4px">
+      <!-- Questions rendered dynamically -->
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn btn-secondary" onclick="closePreviewQuiz()">Жабу</button>
+      <button class="btn btn-ocean" id="preview-modal-btn-edit" onclick="">✏️ Редактировать</button>
+      <button class="btn btn-primary" id="preview-modal-btn-pub" onclick="">📢 Опубликовать</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-quiz-modal" style="display:none" onclick="if(event.target===this)closeEditQuiz()">
+  <div class="modal" style="width:min(900px,96vw)">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">✏️ Тестті редакциялау</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Сұрақтарды, дұрыс жауаптар мен түсіндірмелерді өзгертіңіз</div>
+      </div>
+      <button class="modal-close" onclick="closeEditQuiz()">×</button>
+    </div>
+    <div style="max-height:70vh;overflow-y:auto;padding-right:6px">
+      <!-- General settings -->
+      <div class="card" style="margin-bottom:16px;padding:18px 20px">
+        <div class="form-grid">
+          <div class="field span2">
+            <label>Тест атауы</label>
+            <input type="text" id="edit-quiz-title" placeholder="Тест атауын енгізіңіз"/>
+          </div>
+          <div class="field">
+            <label>Қиындық деңгейі</label>
+            <select id="edit-quiz-diff">
+              <option value="easy">🟢 Жеңіл</option>
+              <option value="medium">🟡 Орташа</option>
+              <option value="hard">🔴 Қиын</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Статус</label>
+            <select id="edit-quiz-status">
+              <option value="published">Опубликован (Оқушыларға ашық)</option>
+              <option value="draft">Черновик (Жасырын)</option>
+              <option value="ready">Готов</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <h4 style="font-family:var(--serif);font-size:16px;color:var(--forest)">Тест сұрақтары (<span id="edit-q-count">0</span>)</h4>
+        <button class="btn btn-secondary" onclick="addEditQuestion()" style="padding:6px 14px;font-size:12px">
+          ➕ Сұрақ қосу
+        </button>
+      </div>
+      <div id="edit-questions-container"></div>
+      <div style="text-align:center;margin:14px 0">
+        <button class="btn btn-secondary" onclick="addEditQuestion()" style="width:100%;border-style:dashed">
+          ➕ Тағы бір сұрақ қосу
+        </button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn btn-secondary" onclick="closeEditQuiz()">Бас тарту</button>
+      <button class="btn btn-primary" id="btn-save-edit-quiz" onclick="saveEditedQuiz()">💾 Өзгерістерді сақтау</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="delete-confirm-modal" style="display:none" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="modal" style="width:min(480px,94vw);text-align:center;padding:32px 28px">
+    <div style="width:54px;height:54px;background:#fee2e2;color:#dc2626;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">
+      ⚠️
+    </div>
+    <div class="modal-title" style="font-size:20px;margin-bottom:8px">Тестті өшіруді растаңыз</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:18px">
+      Сіз шынымен <strong id="delete-quiz-name" style="color:var(--ink)"></strong> тестін өшіргіңіз келе ме? Бұл әрекетті қайтару мүмкін емес, барлық сұрақтар мен оқушылар нәтижелері жойылады.
+    </p>
+    <div style="display:flex;justify-content:center;gap:10px">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()" style="min-width:110px">Жоқ, артқа</button>
+      <button class="btn" id="btn-confirm-delete" onclick="executeDeleteQuiz()" style="background:#dc2626;color:#fff;min-width:120px">Иә, өшіру</button>
+    </div>
   </div>
 </div>
 
@@ -360,7 +1054,7 @@ checkAuth().then(user => { if (user && typeof init === 'function') init(); });
 // ── State ──────────────────────────────────────────────────────────────────────
 let lessons = [], activeLessonId = null, qCount = 0, materials = [];
 
-function init() { fetchLessons(); addQuestion(); loadMaterials(); }
+function init() { fetchLessons(); addQuestion(); loadMaterials(); loadAIQuizzes(); }
 
 // ── Lessons ────────────────────────────────────────────────────────────────────
 async function fetchLessons() {
@@ -586,10 +1280,11 @@ async function generateQuiz(materialId) {
     }
 
     const count = Number(data.question_count) || 0;
-    toast(count ? `Тест жасалды: ${count} сұрақ ✓` : (data.message || 'Тест жасалды ✓'), 'ok');
+    toast(count ? `Тест сәтті жасалды: ${count} сұрақ ✓` : (data.message || 'Тест жасалды ✓'), 'ok');
     if (typeof loadAIQuizzes === 'function') {
       await loadAIQuizzes();
     }
+    showTab('aiquizzes');
   } catch (error) {
     toast(error.message || 'Сервермен байланыс жоқ', 'err');
   } finally {
@@ -636,6 +1331,631 @@ async function showReaders(materialId, title) {
   } catch(_) {
     panel.innerHTML = '<div style="font-size:13px;color:var(--danger);padding:8px 0">Жүктеу мүмкін болмады</div>';
   }
+}
+
+// ── AI Quizzes State & Management ──────────────────────────────────────────────
+let aiQuizzes = [];
+let currentPreviewQuiz = null;
+let currentEditingQuizId = null;
+let quizToDelete = null;
+
+async function loadAIQuizzes() {
+  const listEl = document.getElementById('ai-quizzes-list');
+  if (!listEl) return;
+  try {
+    const res = await fetch('/api/teacher/ai-quizzes');
+    if (!res.ok) {
+      listEl.innerHTML = '<div style="font-size:13px;color:var(--danger);text-align:center;padding:30px">Тесттерді жүктеу сәтсіз аяқталды</div>';
+      return;
+    }
+    const data = await res.json();
+    aiQuizzes = data.quizzes || [];
+    updateAIStats(aiQuizzes);
+    filterAIQuizzes();
+  } catch (err) {
+    listEl.innerHTML = '<div style="font-size:13px;color:var(--danger);text-align:center;padding:30px">Сервермен байланыс жоқ</div>';
+  }
+}
+
+function updateAIStats(list) {
+  const total = list.length;
+  const published = list.filter(q => (q.status || 'published') === 'published').length;
+  const drafts = list.filter(q => q.status === 'draft').length;
+  let totalAttempts = 0;
+  let scoreSum = 0;
+  let scoredCount = 0;
+
+  list.forEach(q => {
+    const att = Number(q.attempt_count) || 0;
+    totalAttempts += att;
+    if (att > 0 && q.avg_percent != null) {
+      scoreSum += Number(q.avg_percent);
+      scoredCount++;
+    }
+  });
+
+  const avgScore = scoredCount > 0 ? Math.round(scoreSum / scoredCount) + '%' : '—';
+
+  const elTotal = document.getElementById('stat-total-quizzes');
+  const elPub = document.getElementById('stat-published-quizzes');
+  const elDraft = document.getElementById('stat-draft-quizzes');
+  const elAtt = document.getElementById('stat-total-attempts');
+  const elAvg = document.getElementById('stat-avg-score');
+
+  if (elTotal) elTotal.textContent = total;
+  if (elPub) elPub.textContent = published;
+  if (elDraft) elDraft.textContent = drafts;
+  if (elAtt) elAtt.textContent = totalAttempts;
+  if (elAvg) elAvg.textContent = avgScore;
+
+  const navBadge = document.getElementById('nav-ai-badge');
+  if (navBadge) {
+    if (total > 0) {
+      navBadge.style.display = 'inline-flex';
+      navBadge.textContent = total;
+    } else {
+      navBadge.style.display = 'none';
+    }
+  }
+}
+
+function filterAIQuizzes() {
+  const searchInput = document.getElementById('ai-search-input');
+  const statusSelect = document.getElementById('ai-filter-status');
+  const diffSelect = document.getElementById('ai-filter-diff');
+  const sortSelect = document.getElementById('ai-filter-sort');
+
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  const status = statusSelect?.value || 'all';
+  const diff = diffSelect?.value || 'all';
+  const sort = sortSelect?.value || 'newest';
+
+  let filtered = aiQuizzes.slice();
+
+  // Search filter
+  if (query) {
+    filtered = filtered.filter(q =>
+      (q.title && q.title.toLowerCase().includes(query)) ||
+      (q.material_title && q.material_title.toLowerCase().includes(query))
+    );
+  }
+
+  // Status filter
+  if (status !== 'all') {
+    filtered = filtered.filter(q => (q.status || 'published') === status);
+  }
+
+  // Difficulty filter
+  if (diff !== 'all') {
+    filtered = filtered.filter(q => q.difficulty === diff);
+  }
+
+  // Sort
+  if (sort === 'oldest') {
+    filtered.sort((a, b) => a.id - b.id);
+  } else if (sort === 'questions') {
+    filtered.sort((a, b) => (b.question_count || 0) - (a.question_count || 0));
+  } else {
+    // Newest first
+    filtered.sort((a, b) => b.id - a.id);
+  }
+
+  renderAIQuizzes(filtered);
+}
+
+function renderAIQuizzes(list) {
+  const listEl = document.getElementById('ai-quizzes-list');
+  if (!listEl) return;
+
+  if (aiQuizzes.length === 0) {
+    // Empty state
+    listEl.innerHTML = `
+      <div class="ai-empty-state">
+        <div class="ai-empty-icon">🤖</div>
+        <div class="ai-empty-title">Вы ещё не создали тесты с помощью ИИ</div>
+        <p class="ai-empty-text">Жүктелген конспектілер немесе оқулықтар негізінде жасанды интеллект көмегімен бірнеше секундта сапалы ҰБТ тесттерін жасаңыз. Олар автоматты түрде осы бөлімде пайда болады.</p>
+        <button class="btn btn-primary" onclick="showTab('materials')" style="padding:11px 22px">
+          <span>📁</span> Материалдарға өтіп, тест жасау
+        </button>
+      </div>`;
+    return;
+  }
+
+  if (list.length === 0) {
+    listEl.innerHTML = `
+      <div class="ai-empty-state" style="padding:36px 20px">
+        <div style="font-size:36px;margin-bottom:10px">🔍</div>
+        <div class="ai-empty-title" style="font-size:18px">Сәйкес келетін тесттер табылмады</div>
+        <p class="ai-empty-text">Іздеу сөзін немесе сүзгілер параметрлерін өзгертіп көріңіз.</p>
+        <button class="btn btn-secondary" onclick="resetAIFilters()">Сүзгілерді тазарту</button>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = `
+    <div class="ai-quiz-grid">
+      ${list.map(q => renderSingleQuizCard(q)).join('')}
+    </div>`;
+}
+
+function resetAIFilters() {
+  const s = document.getElementById('ai-search-input');
+  const st = document.getElementById('ai-filter-status');
+  const d = document.getElementById('ai-filter-diff');
+  const so = document.getElementById('ai-filter-sort');
+  if (s) s.value = '';
+  if (st) st.value = 'all';
+  if (d) d.value = 'all';
+  if (so) so.value = 'newest';
+  filterAIQuizzes();
+}
+
+function renderSingleQuizCard(q) {
+  const status = q.status || 'published';
+  let statusBadge = '';
+  if (status === 'published') {
+    statusBadge = '<span class="status-badge status-published"><span class="dot"></span> Опубликован</span>';
+  } else if (status === 'draft') {
+    statusBadge = '<span class="status-badge status-draft"><span class="dot"></span> Черновик</span>';
+  } else {
+    statusBadge = '<span class="status-badge status-ready"><span class="dot"></span> Готов</span>';
+  }
+
+  const diffCls = q.difficulty === 'easy' ? 'diff-easy' : q.difficulty === 'hard' ? 'diff-hard' : 'diff-medium';
+  const diffTxt = q.difficulty === 'easy' ? '🟢 Жеңіл' : q.difficulty === 'hard' ? '🔴 Қиын' : '🟡 Орташа';
+
+  const publishBtn = status === 'published'
+    ? `<button class="btn-card btn-card-unpublish" onclick="togglePublishQuiz(${q.id}, '${status}')" title="Оқушыларға көрінбейтін қылып черновикке алу">🔒 Черновик</button>`
+    : `<button class="btn-card btn-card-publish" onclick="togglePublishQuiz(${q.id}, '${status}')" title="Оқушыларға қолжетімді қылып жариялау">📢 Опубликовать</button>`;
+
+  const scoreVal = q.attempt_count > 0 && q.avg_percent != null ? Math.round(q.avg_percent) : null;
+  let scoreClass = 'score-good';
+  if (scoreVal !== null) {
+    if (scoreVal < 40) scoreClass = 'score-low';
+    else if (scoreVal < 70) scoreClass = 'score-mid';
+  }
+
+  const safeTitle = escapeHTML(q.title || 'Тест');
+  const safeMatTitle = escapeHTML(q.material_title || 'Жүктелген материал');
+  const jsTitle = escapeForAttr(q.title || 'Тест');
+
+  return `
+    <div class="ai-quiz-card" id="quiz-card-${q.id}">
+      <div>
+        <div class="ai-quiz-card-head">
+          <div class="ai-quiz-badges">
+            ${statusBadge}
+            <span class="diff-badge ${diffCls}">${diffTxt}</span>
+          </div>
+          <span class="ai-quiz-date">📅 ${q.created_at || ''}</span>
+        </div>
+
+        <h3 class="ai-quiz-title" title="${safeTitle}">${safeTitle}</h3>
+
+        <div class="ai-quiz-mat" title="${safeMatTitle}">
+          <span>📁 Материал:</span>
+          <strong>${safeMatTitle}</strong>
+        </div>
+
+        <div class="ai-quiz-metrics">
+          <span class="ai-metric-item">❓ <strong>${q.question_count || 0}</strong> сұрақ</span>
+          <span class="ai-metric-item">👥 <strong>${q.attempt_count || 0}</strong> тапсырыс</span>
+          ${scoreVal !== null ? `<span class="ai-metric-item ${scoreClass}">🎯 <strong>${scoreVal}%</strong> орташа</span>` : ''}
+        </div>
+      </div>
+
+      <div class="ai-card-actions">
+        <button class="btn-card btn-card-preview" onclick="openPreviewQuiz(${q.id})">👁 Просмотреть тест</button>
+        <button class="btn-card btn-card-edit" onclick="openEditQuiz(${q.id})">✏️ Редактировать</button>
+        ${publishBtn}
+        ${q.attempt_count > 0 ? `<button class="btn-card btn-card-results" onclick="showResults(${q.id}, '${jsTitle}')">📊 Нәтижелер</button>` : ''}
+        <button class="btn-card btn-card-delete" onclick="confirmDeleteQuiz(${q.id}, '${jsTitle}')">🗑️ Өшіру</button>
+      </div>
+    </div>`;
+}
+
+// ── Preview Modal ─────────────────────────────────────────────────────────────
+async function openPreviewQuiz(quizId) {
+  const modal = document.getElementById('preview-quiz-modal');
+  const body = document.getElementById('preview-modal-body');
+  if (!modal || !body) return;
+
+  modal.style.display = 'flex';
+  body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Жүктелуде...</div>';
+
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${quizId}`);
+    if (!res.ok) {
+      body.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Тестті жүктеу сәтсіз аяқталды</div>';
+      return;
+    }
+    const data = await res.json();
+    const quiz = data.quiz;
+    currentPreviewQuiz = quiz;
+
+    // Header info
+    document.getElementById('preview-modal-title').textContent = quiz.title;
+    document.getElementById('preview-modal-mat').textContent = quiz.material_title ? '📁 Негізгі материал: ' + quiz.material_title : '';
+    document.getElementById('preview-modal-qcount').textContent = `${(quiz.questions || []).length} сұрақ`;
+
+    const statusEl = document.getElementById('preview-modal-status');
+    if (quiz.status === 'published') {
+      statusEl.className = 'status-badge status-published';
+      statusEl.innerHTML = '<span class="dot"></span> Опубликован';
+    } else {
+      statusEl.className = 'status-badge status-draft';
+      statusEl.innerHTML = '<span class="dot"></span> Черновик';
+    }
+
+    const diffEl = document.getElementById('preview-modal-diff');
+    diffEl.className = 'diff-badge ' + (quiz.difficulty === 'easy' ? 'diff-easy' : quiz.difficulty === 'hard' ? 'diff-hard' : 'diff-medium');
+    diffEl.textContent = quiz.difficulty === 'easy' ? '🟢 Жеңіл' : quiz.difficulty === 'hard' ? '🔴 Қиын' : '🟡 Орташа';
+
+    // Footer actions
+    const btnEdit = document.getElementById('preview-modal-btn-edit');
+    if (btnEdit) {
+      btnEdit.onclick = () => { closePreviewQuiz(); openEditQuiz(quiz.id); };
+    }
+    const btnPub = document.getElementById('preview-modal-btn-pub');
+    if (btnPub) {
+      if (quiz.status === 'published') {
+        btnPub.className = 'btn btn-secondary';
+        btnPub.textContent = '🔒 Черновикке алу';
+        btnPub.onclick = async () => {
+          await togglePublishQuiz(quiz.id, quiz.status);
+          openPreviewQuiz(quiz.id);
+        };
+      } else {
+        btnPub.className = 'btn btn-primary';
+        btnPub.textContent = '📢 Опубликовать';
+        btnPub.onclick = async () => {
+          await togglePublishQuiz(quiz.id, quiz.status);
+          openPreviewQuiz(quiz.id);
+        };
+      }
+    }
+
+    // Questions list
+    const questions = quiz.questions || [];
+    if (!questions.length) {
+      body.innerHTML = '<div style="color:var(--muted);padding:20px;text-align:center">Бұл тестте сұрақтар жоқ</div>';
+      return;
+    }
+
+    body.innerHTML = questions.map((q, idx) => {
+      const opts = [
+        { l: 'A', text: q.option_a },
+        { l: 'B', text: q.option_b },
+        { l: 'C', text: q.option_c },
+        { l: 'D', text: q.option_d }
+      ];
+      const correct = (q.correct_option || '').toUpperCase();
+
+      return `
+        <div class="preview-q-card">
+          <div class="preview-q-header">
+            <span class="preview-q-num">Сұрақ ${String(idx + 1).padStart(2, '0')} / ${questions.length}</span>
+          </div>
+          <div class="preview-q-text">${escapeHTML(q.text)}</div>
+          <div class="preview-options-grid">
+            ${opts.map(opt => {
+              const isCorrect = opt.l === correct;
+              return `
+                <div class="preview-opt ${isCorrect ? 'is-correct' : ''}">
+                  <span class="preview-opt-letter">${opt.l}</span>
+                  <span style="flex:1">${escapeHTML(opt.text)}</span>
+                  ${isCorrect ? '<span class="preview-opt-badge">✓ Дұрыс</span>' : ''}
+                </div>`;
+            }).join('')}
+          </div>
+          ${q.explanation ? `
+            <div class="preview-explanation">
+              <span>💡</span>
+              <div><strong>Түсіндірме:</strong> ${escapeHTML(q.explanation)}</div>
+            </div>` : ''}
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    body.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Сервермен байланыс қатесі</div>';
+  }
+}
+
+function closePreviewQuiz() {
+  const modal = document.getElementById('preview-quiz-modal');
+  if (modal) modal.style.display = 'none';
+  currentPreviewQuiz = null;
+}
+
+// ── Edit Modal ────────────────────────────────────────────────────────────────
+async function openEditQuiz(quizId) {
+  const modal = document.getElementById('edit-quiz-modal');
+  const container = document.getElementById('edit-questions-container');
+  if (!modal || !container) return;
+
+  currentEditingQuizId = quizId;
+  modal.style.display = 'flex';
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Жүктелуде...</div>';
+
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${quizId}`);
+    if (!res.ok) {
+      container.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Тестті жүктеу сәтсіз аяқталды</div>';
+      return;
+    }
+    const data = await res.json();
+    const quiz = data.quiz;
+
+    document.getElementById('edit-quiz-title').value = quiz.title || '';
+    document.getElementById('edit-quiz-diff').value = quiz.difficulty || 'medium';
+    document.getElementById('edit-quiz-status').value = quiz.status || 'published';
+
+    container.innerHTML = '';
+    const questions = quiz.questions || [];
+    questions.forEach((q, i) => addEditQuestion(q, i + 1));
+    updateEditQCount();
+
+  } catch (err) {
+    container.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Сервермен байланыс қатесі</div>';
+  }
+}
+
+function closeEditQuiz() {
+  const modal = document.getElementById('edit-quiz-modal');
+  if (modal) modal.style.display = 'none';
+  currentEditingQuizId = null;
+}
+
+function addEditQuestion(data = null, num = null) {
+  const container = document.getElementById('edit-questions-container');
+  if (!container) return;
+
+  const currentCount = container.querySelectorAll('.edit-q-block').length;
+  const n = num || currentCount + 1;
+
+  const el = document.createElement('div');
+  el.className = 'edit-q-block';
+  el.innerHTML = `
+    <div class="edit-q-head">
+      <span class="edit-q-title">Сұрақ #${n}</span>
+      <button type="button" class="btn-remove-q" onclick="removeEditQuestion(this)" title="Сұрақты өшіру">🗑️ Өшіру</button>
+    </div>
+    <div class="field" style="margin-bottom:10px">
+      <label>Сұрақ мәтіні</label>
+      <textarea class="edit-q-text" rows="2" placeholder="Сұрақты жазыңыз...">${data ? escapeHTML(data.text) : ''}</textarea>
+    </div>
+    <div class="preview-options-grid" style="margin-bottom:10px">
+      <div class="field">
+        <label>A нұсқасы</label>
+        <input type="text" class="edit-q-opt-a" value="${data ? escapeHTML(data.option_a) : ''}" placeholder="A нұсқасы"/>
+      </div>
+      <div class="field">
+        <label>B нұсқасы</label>
+        <input type="text" class="edit-q-opt-b" value="${data ? escapeHTML(data.option_b) : ''}" placeholder="B нұсқасы"/>
+      </div>
+      <div class="field">
+        <label>C нұсқасы</label>
+        <input type="text" class="edit-q-opt-c" value="${data ? escapeHTML(data.option_c) : ''}" placeholder="C нұсқасы"/>
+      </div>
+      <div class="field">
+        <label>D нұсқасы</label>
+        <input type="text" class="edit-q-opt-d" value="${data ? escapeHTML(data.option_d) : ''}" placeholder="D нұсқасы"/>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;align-items:flex-end">
+      <div class="field">
+        <label>Дұрыс жауап</label>
+        <select class="edit-q-correct">
+          <option value="A" ${data && data.correct_option === 'A' ? 'selected' : ''}>A нұсқасы</option>
+          <option value="B" ${data && data.correct_option === 'B' ? 'selected' : ''}>B нұсқасы</option>
+          <option value="C" ${data && data.correct_option === 'C' ? 'selected' : ''}>C нұсқасы</option>
+          <option value="D" ${data && data.correct_option === 'D' ? 'selected' : ''}>D нұсқасы</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Түсіндірме (міндетті емес)</label>
+        <input type="text" class="edit-q-exp" value="${data && data.explanation ? escapeHTML(data.explanation) : ''}" placeholder="Неліктен бұл жауап дұрыс?"/>
+      </div>
+    </div>`;
+
+  container.appendChild(el);
+  updateEditQCount();
+}
+
+function removeEditQuestion(btn) {
+  const block = btn.closest('.edit-q-block');
+  if (block) block.remove();
+  renumberEditQuestions();
+  updateEditQCount();
+}
+
+function renumberEditQuestions() {
+  const container = document.getElementById('edit-questions-container');
+  if (!container) return;
+  const blocks = container.querySelectorAll('.edit-q-block');
+  blocks.forEach((b, idx) => {
+    const titleEl = b.querySelector('.edit-q-title');
+    if (titleEl) titleEl.textContent = `Сұрақ #${idx + 1}`;
+  });
+}
+
+function updateEditQCount() {
+  const container = document.getElementById('edit-questions-container');
+  const countEl = document.getElementById('edit-q-count');
+  if (container && countEl) {
+    countEl.textContent = container.querySelectorAll('.edit-q-block').length;
+  }
+}
+
+async function saveEditedQuiz() {
+  if (!currentEditingQuizId) return;
+
+  const title = (document.getElementById('edit-quiz-title').value || '').trim();
+  const difficulty = document.getElementById('edit-quiz-diff').value;
+  const status = document.getElementById('edit-quiz-status').value;
+
+  if (!title) {
+    toast('Тест атауын енгізіңіз', 'err');
+    return;
+  }
+
+  const container = document.getElementById('edit-questions-container');
+  const blocks = container.querySelectorAll('.edit-q-block');
+  if (!blocks.length) {
+    toast('Кем дегенде 1 сұрақ болуы керек', 'err');
+    return;
+  }
+
+  const questions = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    const text = (b.querySelector('.edit-q-text').value || '').trim();
+    const optA = (b.querySelector('.edit-q-opt-a').value || '').trim();
+    const optB = (b.querySelector('.edit-q-opt-b').value || '').trim();
+    const optC = (b.querySelector('.edit-q-opt-c').value || '').trim();
+    const optD = (b.querySelector('.edit-q-opt-d').value || '').trim();
+    const correct = b.querySelector('.edit-q-correct').value;
+    const exp = (b.querySelector('.edit-q-exp').value || '').trim();
+
+    if (!text || !optA || !optB || !optC || !optD) {
+      toast(`${i + 1}-сұрақтың мәтіні немесе нұсқалары толық емес`, 'err');
+      return;
+    }
+
+    questions.push({
+      text,
+      option_a: optA,
+      option_b: optB,
+      option_c: optC,
+      option_d: optD,
+      correct_option: correct,
+      explanation: exp
+    });
+  }
+
+  const btn = document.getElementById('btn-save-edit-quiz');
+  setBusy(btn, true);
+
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${currentEditingQuizId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, difficulty, status, questions })
+    });
+    const d = await res.json();
+    if (!res.ok) {
+      toast(d.message || 'Сақтау қатесі', 'err');
+      return;
+    }
+
+    toast('Тест сәтті сақталды ✓', 'ok');
+    closeEditQuiz();
+    await loadAIQuizzes();
+  } catch (err) {
+    toast('Сервермен байланыс қатесі', 'err');
+  } finally {
+    setBusy(btn, false);
+  }
+}
+
+// ── Publish / Status Toggle ──────────────────────────────────────────────────
+async function togglePublishQuiz(quizId, currentStatus) {
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${quizId}/publish`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast(data.message || 'Статусты өзгерту қатесі', 'err');
+      return;
+    }
+    const newStatus = data.status;
+    if (newStatus === 'published') {
+      toast('Тест оқушылар үшін жарияланды ✓', 'ok');
+    } else {
+      toast('Тест черновикке ауыстырылды (оқушыларға жасырын) ✓', 'ok');
+    }
+    await loadAIQuizzes();
+  } catch (err) {
+    toast('Сервермен байланыс қатесі', 'err');
+  }
+}
+
+// ── Delete Modal ──────────────────────────────────────────────────────────────
+function confirmDeleteQuiz(quizId, title) {
+  quizToDelete = { id: quizId, title: title };
+  const nameEl = document.getElementById('delete-quiz-name');
+  if (nameEl) nameEl.textContent = `«${title}»`;
+  const modal = document.getElementById('delete-confirm-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('delete-confirm-modal');
+  if (modal) modal.style.display = 'none';
+  quizToDelete = null;
+}
+
+async function executeDeleteQuiz() {
+  if (!quizToDelete) return;
+  const btn = document.getElementById('btn-confirm-delete');
+  setBusy(btn, true);
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${quizToDelete.id}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      toast(data.message || 'Өшіру қатесі', 'err');
+      return;
+    }
+    toast('Тест өшірілді ✓', 'ok');
+    closeDeleteModal();
+    await loadAIQuizzes();
+  } catch (err) {
+    toast('Сервермен байланыс қатесі', 'err');
+  } finally {
+    setBusy(btn, false);
+  }
+}
+
+// ── Results helper ────────────────────────────────────────────────────────────
+async function showResults(quizId, title) {
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  if (!modal || !modalBody) return;
+
+  if (modalTitle) modalTitle.textContent = `Нәтижелер: ${title}`;
+  modal.style.display = 'flex';
+  modalBody.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner" style="border-color:#0284c7;border-top-color:transparent"></span> Жүктелуде...</div>';
+
+  try {
+    const res = await fetch(`/api/teacher/ai-quizzes/${quizId}/results`);
+    if (!res.ok) {
+      modalBody.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Нәтижелерді жүктеу қатесі</div>';
+      return;
+    }
+    const data = await res.json();
+    renderResults(data.results || []);
+  } catch (err) {
+    modalBody.innerHTML = '<div style="color:var(--danger);padding:20px;text-align:center">Сервермен байланыс жоқ</div>';
+  }
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeForAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
 function renderResults(results) {

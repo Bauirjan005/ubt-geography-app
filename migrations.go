@@ -86,8 +86,10 @@ func migratePostgres(db *DB) error {
 			teacher_id  BIGINT      NOT NULL REFERENCES users(id)     ON DELETE CASCADE,
 			title       TEXT        NOT NULL,
 			difficulty  TEXT        NOT NULL CHECK(difficulty IN ('easy','medium','hard')),
+			status      TEXT        NOT NULL DEFAULT 'published' CHECK(status IN ('draft','published','ready')),
 			created_at  TIMESTAMPTZ NOT NULL
 		)`,
+		`ALTER TABLE ai_quizzes ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'published'`,
 		`CREATE INDEX IF NOT EXISTS idx_ai_quizzes_material ON ai_quizzes(material_id)`,
 
 		// ── ai_questions ──────────────────────────────────────────────────────
@@ -226,6 +228,7 @@ func migrateSQLite(db *DB) error {
 			teacher_id  INTEGER  NOT NULL REFERENCES users(id)     ON DELETE CASCADE,
 			title       TEXT     NOT NULL,
 			difficulty  TEXT     NOT NULL CHECK(difficulty IN ('easy','medium','hard')),
+			status      TEXT     NOT NULL DEFAULT 'published',
 			created_at  DATETIME NOT NULL
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_ai_quizzes_material ON ai_quizzes(material_id)`,
@@ -284,5 +287,12 @@ func migrateSQLite(db *DB) error {
 			return err
 		}
 	}
+
+	var hasCol int
+	_ = db.DB.QueryRow(`SELECT count(*) FROM pragma_table_info('ai_quizzes') WHERE name='status'`).Scan(&hasCol)
+	if hasCol == 0 {
+		_, _ = db.DB.Exec(`ALTER TABLE ai_quizzes ADD COLUMN status TEXT NOT NULL DEFAULT 'published'`)
+	}
+
 	return nil
 }

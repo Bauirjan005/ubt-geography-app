@@ -321,6 +321,7 @@ func handleListAIQuizzes(db *DB) http.HandlerFunc {
 			JOIN materials m ON m.id = aq.material_id
 			LEFT JOIN ai_questions aqu ON aqu.quiz_id = aq.id
 			LEFT JOIN ai_quiz_attempts att ON att.quiz_id = aq.id AND att.student_id = ?
+			WHERE (aq.status IS NULL OR aq.status = 'published')
 			GROUP BY aq.id, aq.title, aq.difficulty, m.title, att.id, att.score, att.total, aq.created_at
 			ORDER BY aq.created_at DESC
 		`, sess.UserID)
@@ -409,7 +410,7 @@ func handleGetAIQuizForStudent(db *DB) http.HandlerFunc {
 		var qz QuizDetail
 
 		err = db.QueryRow(
-			`SELECT id, title, difficulty FROM ai_quizzes WHERE id = ?`,
+			`SELECT id, title, difficulty FROM ai_quizzes WHERE id = ? AND (status IS NULL OR status = 'published')`,
 			quizID,
 		).Scan(&qz.ID, &qz.Title, &qz.Difficulty)
 
