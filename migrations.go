@@ -123,6 +123,16 @@ func migrateAll(db *sql.DB) error {
     UNIQUE(student_id, question_id)
 )`,
 		`CREATE INDEX IF NOT EXISTS idx_seen_student ON student_seen_questions(student_id, quiz_id)`,
+
+		// ── sessions ─────────────────────────────────────────────────────────
+		`CREATE TABLE IF NOT EXISTS sessions (
+			id         TEXT     PRIMARY KEY,
+			user_id    INTEGER  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+			role       TEXT     NOT NULL,
+			created_at DATETIME NOT NULL,
+			expires_at DATETIME NOT NULL
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`,
 	}
 
 	for _, stmt := range migrations {

@@ -38,16 +38,16 @@ func validateRegisterInput(r RegisterRequest) string {
 	r.Email = strings.TrimSpace(r.Email)
 
 	if len(r.Username) < 2 || len(r.Username) > 64 {
-		return "username must be between 2 and 64 characters"
+		return "Аты-жөні 2 мен 64 таңба аралығында болуы керек / Имя должно быть от 2 до 64 символов"
 	}
 	if !strings.Contains(r.Email, "@") || len(r.Email) < 5 {
-		return "invalid email address"
+		return "Дұрыс email мекенжайын енгізіңіз / Введите корректный адрес email"
 	}
 	if err := validatePassword(r.Password); err != "" {
 		return err
 	}
 	if r.Role != "student" && r.Role != "teacher" {
-		return "role must be 'student' or 'teacher'"
+		return "Рөлді таңдаңыз (мұғалім немесе оқушы) / Выберите роль"
 	}
 	return ""
 }
@@ -56,7 +56,7 @@ func validateRegisterInput(r RegisterRequest) string {
 // at least 8 chars, one uppercase letter, one digit.
 func validatePassword(pw string) string {
 	if len(pw) < 8 {
-		return "password must be at least 8 characters"
+		return "Құпия сөз кемінде 8 таңбадан тұруы керек / Пароль должен быть не менее 8 символов"
 	}
 	var hasUpper, hasDigit bool
 	for _, ch := range pw {
@@ -68,10 +68,10 @@ func validatePassword(pw string) string {
 		}
 	}
 	if !hasUpper {
-		return "password must contain at least one uppercase letter"
+		return "Құпия сөзде кемінде бір бас әріп (A-Z немесе А-Я) болуы керек / Пароль должен содержать хотя бы одну заглавную букву"
 	}
 	if !hasDigit {
-		return "password must contain at least one digit"
+		return "Құпия сөзде кемінде бір сан (0-9) болуы керек / Пароль должен содержать хотя бы одну цифру"
 	}
 	return ""
 }
@@ -115,7 +115,7 @@ func handleRegister(db *sql.DB) http.HandlerFunc {
 			return
 		}
 		if exists > 0 {
-			writeJSON(w, http.StatusBadRequest, AuthResponse{Message: "an account with that email already exists"})
+			writeJSON(w, http.StatusBadRequest, AuthResponse{Message: "Бұл email бойынша аккаунт тіркелген / Аккаунт с таким email уже существует. «Войти» батырмасы арқылы кіріңіз"})
 			return
 		}
 
@@ -186,7 +186,7 @@ func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
 			// Run bcrypt anyway to prevent timing attacks that could reveal
 			// whether an email is registered.
 			bcrypt.CompareHashAndPassword([]byte("$2a$12$placeholder.hash.to.waste.time"), []byte(req.Password))
-			writeJSON(w, http.StatusUnauthorized, AuthResponse{Message: "invalid email or password"})
+			writeJSON(w, http.StatusUnauthorized, AuthResponse{Message: "Қате email немесе құпия сөз / Неверный email или пароль"})
 			return
 		}
 		if err != nil {
@@ -196,7 +196,7 @@ func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
 
 		// Verify the password against the stored hash
 		if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
-			writeJSON(w, http.StatusUnauthorized, AuthResponse{Message: "invalid email or password"})
+			writeJSON(w, http.StatusUnauthorized, AuthResponse{Message: "Қате email немесе құпия сөз / Неверный email или пароль"})
 			return
 		}
 
@@ -220,7 +220,7 @@ func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
 			HttpOnly: true,
 			Secure:   isSecure,
 			SameSite: http.SameSiteLaxMode,
-			MaxAge:   60 * 60 * 24 * 7,
+			MaxAge:   60 * 60 * 24 * 30,
 		})
 
 		writeJSON(w, http.StatusOK, AuthResponse{

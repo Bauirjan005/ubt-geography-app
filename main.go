@@ -61,7 +61,7 @@ func main() {
 		log.Fatalf("❌ Миграция қатесі: %v", err)
 	}
 
-	sessions := NewSessionStore()
+	sessions := NewSessionStore(db)
 	mux := http.NewServeMux()
 
 	// ── Public ────────────────────────────────────────────────────────────────

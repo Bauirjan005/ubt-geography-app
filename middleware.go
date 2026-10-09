@@ -29,13 +29,14 @@ func requireAuth(sessions *SessionStore) func(http.Handler) http.Handler {
 			sess, ok := sessions.Get(cookie.Value)
 			if !ok {
 				// Session expired or forged — clear the stale cookie
+				isSecure := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
 				http.SetCookie(w, &http.Cookie{
 					Name:     "session_id",
 					Value:    "",
 					Path:     "/",
 					HttpOnly: true,
-					Secure:   true,
-					SameSite: http.SameSiteStrictMode,
+					Secure:   isSecure,
+					SameSite: http.SameSiteLaxMode,
 					MaxAge:   -1,
 				})
 				writeJSON(w, http.StatusUnauthorized, AuthResponse{Message: "session expired, please log in again"})

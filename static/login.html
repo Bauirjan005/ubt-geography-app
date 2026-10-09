@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ҰБТ География — Вход</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -49,7 +49,7 @@
       background: var(--paper);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 48px 44px;
+      padding: 44px 40px;
       width: 100%;
       max-width: 440px;
       box-shadow: 0 4px 32px rgba(26,61,43,.08);
@@ -58,12 +58,18 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
-    .geo-logo-badge { width:42px; height:42px; border-radius:50%; background:rgba(26,61,43,0.06); border:1.5px solid rgba(196,147,74,0.5); box-shadow:0 2px 8px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .25s ease; }
-    .geo-logo-badge:hover { transform:scale(1.06); border-color:rgba(196,147,74,.8); }
+    .geo-logo-badge {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(26,61,43,0.06); border: 1.5px solid rgba(196,147,74,0.5);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .25s ease;
+    }
+    .geo-logo-badge:hover { transform: scale(1.06); border-color: rgba(196,147,74,.8); }
     .logo-text { display: flex; flex-direction: column; gap: 2px; }
-    .logo-main { font-family: var(--serif); font-size: 20px; color: var(--forest); }
+    .logo-main { font-family: var(--serif); font-size: 20px; color: var(--forest); font-weight: 600; }
     .logo-sub  { font-size: 11px; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; }
 
     /* Tabs */
@@ -72,11 +78,11 @@
       background: var(--parchment);
       border-radius: 10px;
       padding: 4px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       gap: 4px;
     }
     .tab {
-      flex: 1; padding: 9px; border: none; background: none;
+      flex: 1; padding: 10px; border: none; background: none;
       border-radius: 7px; font-family: var(--sans); font-size: 14px;
       color: var(--muted); cursor: pointer; transition: all .2s;
     }
@@ -94,6 +100,47 @@
     }
     .field input:focus, .field select:focus { border-color: var(--forest); background: #fff; }
 
+    /* Password Input Wrapper with Eye toggle */
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .password-wrapper input {
+      padding-right: 46px !important;
+    }
+    .btn-toggle-pw {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      transition: color .2s, background-color .2s;
+      outline: none;
+    }
+    .btn-toggle-pw:hover {
+      color: var(--forest);
+      background-color: rgba(13,94,56,0.08);
+    }
+    .btn-toggle-pw:focus-visible {
+      outline: 2px solid var(--forest);
+    }
+    .btn-toggle-pw svg {
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
     .btn-submit {
       background: var(--forest); color: #fff;
       border: none; border-radius: 10px;
@@ -109,7 +156,8 @@
       background: var(--danger-l); border: 1px solid rgba(192,57,43,.25);
       border-radius: 8px; padding: 11px 14px;
       font-size: 13px; color: var(--danger);
-      display: none;
+      display: none; line-height: 1.4;
+      margin-bottom: 16px;
     }
     .error-box.show { display: block; animation: shake .3s ease; }
     @keyframes shake {
@@ -117,8 +165,6 @@
       25%      { transform: translateX(-6px); }
       75%      { transform: translateX(6px); }
     }
-
-    .divider { height: 1px; background: var(--border); margin: 4px 0; }
 
     .spinner {
       display: inline-block; width: 16px; height: 16px;
@@ -195,19 +241,33 @@
       <button class="tab" id="tab-reg" onclick="switchTab('register')">Регистрация</button>
     </div>
 
-    <!-- Ошибка -->
+    <!-- Сообщение об ошибке -->
     <div class="error-box" id="error-box"></div>
 
     <!-- LOGIN FORM -->
     <div id="form-login">
       <div class="form">
         <div class="field">
-          <label>Email</label>
-          <input type="email" id="login-email" placeholder="teacher@ubt.kz" autocomplete="email"/>
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="example@gmail.com" autocomplete="email"/>
         </div>
         <div class="field">
-          <label>Пароль</label>
-          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+          <label for="login-password">Пароль</label>
+          <div class="password-wrapper">
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+            <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('login-password', this)" title="Показать пароль" aria-label="Показать пароль">
+              <!-- Closed eye icon initially -->
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+              <!-- Open eye icon -->
+              <svg class="eye-open" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
         </div>
         <button class="btn-submit" id="btn-login" onclick="doLogin()">Войти</button>
       </div>
@@ -217,19 +277,31 @@
     <div id="form-register" style="display:none">
       <div class="form">
         <div class="field">
-          <label>Имя</label>
+          <label for="reg-name">Имя</label>
           <input type="text" id="reg-name" placeholder="Аяна Сейткали"/>
         </div>
         <div class="field">
-          <label>Email</label>
-          <input type="email" id="reg-email" placeholder="teacher@ubt.kz"/>
+          <label for="reg-email">Email</label>
+          <input type="email" id="reg-email" placeholder="example@gmail.com"/>
         </div>
         <div class="field">
-          <label>Пароль (мин. 8 символов, 1 заглавная, 1 цифра)</label>
-          <input type="password" id="reg-password" placeholder="Secret123"/>
+          <label for="reg-password">Пароль (мин. 8 символов, 1 заглавная, 1 цифра)</label>
+          <div class="password-wrapper">
+            <input type="password" id="reg-password" placeholder="Secret123" autocomplete="new-password"/>
+            <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('reg-password', this)" title="Показать пароль" aria-label="Показать пароль">
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+              <svg class="eye-open" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="field">
-          <label>Роль</label>
+          <label for="reg-role">Роль</label>
           <select id="reg-role">
             <option value="teacher">👩‍🏫 Мұғалім (Учитель)</option>
             <option value="student">🎓 Оқушы (Ученик)</option>
@@ -244,7 +316,47 @@
 <footer>ҰБТ География · оқыту платформасы</footer>
 
 <script>
-  // ── Tab switching ──────────────────────────────────────────────────────────
+  // ── Авто-проверка активной сессии при открытии страницы ───────────────────
+  (async function() {
+    try {
+      const r = await fetch('/api/me', { credentials: 'include' });
+      if (r.ok) {
+        const u = await r.json();
+        if (u.role === 'teacher') location.replace('/teacher_dashboard.html');
+        else location.replace('/student_dashboard.html');
+      }
+    } catch (_) {}
+  })();
+
+  // ── Заполнение сохранённого email ──────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('ubt_saved_email');
+    if (saved) {
+      const em = document.getElementById('login-email');
+      if (em && !em.value) em.value = saved;
+    }
+  });
+
+  // ── Глазок: переключение видимости пароля ─────────────────────────────────
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+
+    const eyeClosed = btn.querySelector('.eye-closed');
+    const eyeOpen = btn.querySelector('.eye-open');
+    if (eyeClosed && eyeOpen) {
+      eyeClosed.style.display = isPassword ? 'none' : 'block';
+      eyeOpen.style.display   = isPassword ? 'block' : 'none';
+    }
+    const tip = isPassword ? 'Скрыть пароль' : 'Показать пароль';
+    btn.setAttribute('title', tip);
+    btn.setAttribute('aria-label', tip);
+    input.focus();
+  }
+
+  // ── Переключение вкладок ──────────────────────────────────────────────────
   function switchTab(tab) {
     document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
     document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
@@ -258,22 +370,26 @@
     el.textContent = msg;
     el.className = 'error-box show';
   }
+
   function hideError() {
     document.getElementById('error-box').className = 'error-box';
   }
 
   function setBusy(btn, on) {
     btn.disabled = on;
-    if (on) { btn._t = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span>Загрузка...'; }
+    if (on) { btn._t = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span>Жүктелуде...'; }
     else     { btn.innerHTML = btn._t; }
   }
 
-  // ── Login ──────────────────────────────────────────────────────────────────
+  // ── Вход (Login) ──────────────────────────────────────────────────────────
   async function doLogin() {
     hideError();
     const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!email || !password) { showError('Заполните все поля'); return; }
+    if (!email || !password) {
+      showError('Барлық өрістерді толтырыңыз / Заполните все поля');
+      return;
+    }
 
     const btn = document.getElementById('btn-login');
     setBusy(btn, true);
@@ -281,25 +397,32 @@
       const r = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       const d = await r.json();
-      if (!r.ok) { showError(d.message || 'Неверный email или пароль'); return; }
+      if (!r.ok) {
+        showError(d.message || 'Қате email немесе құпия сөз / Неверный email или пароль');
+        return;
+      }
 
-      // Redirect based on role
+      // Сохраняем email для быстрого входа в следующий раз
+      localStorage.setItem('ubt_saved_email', email);
+
+      // Перенаправление по роли
       if (d.role === 'teacher') {
         window.location.href = '/teacher_dashboard.html';
       } else {
         window.location.href = '/student_dashboard.html';
       }
     } catch (_) {
-      showError('Нет соединения с сервером');
+      showError('Сервермен байланыс жоқ / Нет соединения с сервером');
     } finally {
       setBusy(btn, false);
     }
   }
 
-  // ── Register ───────────────────────────────────────────────────────────────
+  // ── Регистрация (Register) ────────────────────────────────────────────────
   async function doRegister() {
     hideError();
     const username = document.getElementById('reg-name').value.trim();
@@ -307,7 +430,10 @@
     const password = document.getElementById('reg-password').value;
     const role     = document.getElementById('reg-role').value;
 
-    if (!username || !email || !password) { showError('Заполните все поля'); return; }
+    if (!username || !email || !password) {
+      showError('Барлық өрістерді толтырыңыз / Заполните все поля');
+      return;
+    }
 
     const btn = document.getElementById('btn-reg');
     setBusy(btn, true);
@@ -315,15 +441,23 @@
       const r = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, email, password, role })
       });
       const d = await r.json();
-      if (!r.ok) { showError(d.message || 'Ошибка регистрации'); return; }
+      if (!r.ok) {
+        showError(d.message || 'Тіркелу қатесі / Ошибка регистрации');
+        return;
+      }
 
-      // Auto-login after registration
+      // Сохраняем email
+      localStorage.setItem('ubt_saved_email', email);
+
+      // Автоматический вход после успешной регистрации
       const r2 = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       const d2 = await r2.json();
@@ -333,13 +467,13 @@
         window.location.href = '/student_dashboard.html';
       }
     } catch (_) {
-      showError('Нет соединения с сервером');
+      showError('Сервермен байланыс жоқ / Нет соединения с сервером');
     } finally {
       setBusy(btn, false);
     }
   }
 
-  // Enter key support
+  // Enter клавишасын қолдау
   document.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const loginVisible = document.getElementById('form-login').style.display !== 'none';
