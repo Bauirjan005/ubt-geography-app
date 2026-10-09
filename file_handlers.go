@@ -36,7 +36,7 @@ type MaterialSummary struct {
 
 // POST /api/teacher/materials
 // Принимает JSON с base64-encoded файлом
-func handleUploadMaterial(db *sql.DB) http.HandlerFunc {
+func handleUploadMaterial(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -145,7 +145,7 @@ func handleUploadMaterial(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		result, err := db.Exec(
+		id, err := db.InsertReturningID(
 			`INSERT INTO materials (teacher_id, title, filename, original_name, file_type, file_size, created_at)
 			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
 			sess.UserID,
@@ -164,14 +164,6 @@ func handleUploadMaterial(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		id, err := result.LastInsertId()
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{
-				"message": "failed to get material ID",
-			})
-			return
-		}
-
 		writeJSON(w, http.StatusCreated, map[string]any{
 			"message":     "жүктелді",
 			"material_id": id,
@@ -181,7 +173,7 @@ func handleUploadMaterial(db *sql.DB) http.HandlerFunc {
 }
 
 // GET /api/teacher/materials
-func handleListTeacherMaterials(db *sql.DB) http.HandlerFunc {
+func handleListTeacherMaterials(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 
@@ -247,7 +239,7 @@ func handleListTeacherMaterials(db *sql.DB) http.HandlerFunc {
 }
 
 // GET /api/student/materials/{id}/view
-func handleViewMaterial(db *sql.DB) http.HandlerFunc {
+func handleViewMaterial(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 
@@ -308,7 +300,7 @@ func parseMaterialID(path string) (int64, error) {
 
 // GET /api/teacher/materials/{id}/readers
 // Материалды кім ашқанын ФИО + уақытымен береді
-func handleMaterialReaders(db *sql.DB) http.HandlerFunc {
+func handleMaterialReaders(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 

@@ -58,7 +58,7 @@ type FeedbackItem struct {
 
 // ── GET /api/student/lessons ──────────────────────────────────────────────────
 
-func handleListStudentLessons(db *sql.DB) http.HandlerFunc {
+func handleListStudentLessons(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -77,7 +77,7 @@ func handleListStudentLessons(db *sql.DB) http.HandlerFunc {
 			FROM lessons l
 			LEFT JOIN questions q ON q.lesson_id = l.id
 			LEFT JOIN student_attempts sa ON sa.lesson_id = l.id AND sa.student_id = ?
-			GROUP BY l.id
+			GROUP BY l.id, l.title, l.created_at, sa.score, sa.total, sa.id
 			ORDER BY l.created_at DESC
 		`, sess.UserID)
 		if err != nil {
@@ -127,7 +127,7 @@ func handleListStudentLessons(db *sql.DB) http.HandlerFunc {
 
 // ── GET /api/student/lessons/{id} ────────────────────────────────────────────
 
-func handleGetLessonDetail(db *sql.DB) http.HandlerFunc {
+func handleGetLessonDetail(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -207,7 +207,7 @@ func handleGetLessonDetail(db *sql.DB) http.HandlerFunc {
 
 // ── POST /api/student/lessons/{id}/attempt ────────────────────────────────────
 
-func handleSubmitAttempt(db *sql.DB) http.HandlerFunc {
+func handleSubmitAttempt(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -307,7 +307,7 @@ func handleSubmitAttempt(db *sql.DB) http.HandlerFunc {
 
 // ── GET /api/student/ai-quizzes ───────────────────────────────────────────────
 
-func handleListAIQuizzes(db *sql.DB) http.HandlerFunc {
+func handleListAIQuizzes(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 
@@ -321,7 +321,7 @@ func handleListAIQuizzes(db *sql.DB) http.HandlerFunc {
 			JOIN materials m ON m.id = aq.material_id
 			LEFT JOIN ai_questions aqu ON aqu.quiz_id = aq.id
 			LEFT JOIN ai_quiz_attempts att ON att.quiz_id = aq.id AND att.student_id = ?
-			GROUP BY aq.id
+			GROUP BY aq.id, aq.title, aq.difficulty, m.title, att.id, att.score, att.total, aq.created_at
 			ORDER BY aq.created_at DESC
 		`, sess.UserID)
 		if err != nil {
@@ -388,7 +388,7 @@ func handleListAIQuizzes(db *sql.DB) http.HandlerFunc {
 
 // ── GET /api/student/ai-quizzes/{id} — әр рет жаңа 20 сұрақ ─────────────────
 
-func handleGetAIQuizForStudent(db *sql.DB) http.HandlerFunc {
+func handleGetAIQuizForStudent(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 
@@ -479,7 +479,7 @@ func handleGetAIQuizForStudent(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func fetchUnseenQuestions(db *sql.DB, studentID, quizID int64, limit int) ([]AIQuestion, error) {
+func fetchUnseenQuestions(db *DB, studentID, quizID int64, limit int) ([]AIQuestion, error) {
 	rows, err := db.Query(`
 		SELECT id, text, option_a, option_b, option_c, option_d, correct_option, explanation
 		FROM ai_questions
@@ -526,7 +526,7 @@ func fetchUnseenQuestions(db *sql.DB, studentID, quizID int64, limit int) ([]AIQ
 
 // ── POST /api/student/ai-quizzes/{id}/complete ───────────────────────────────
 
-func handleCompleteAIQuiz(db *sql.DB) http.HandlerFunc {
+func handleCompleteAIQuiz(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -569,7 +569,7 @@ func handleCompleteAIQuiz(db *sql.DB) http.HandlerFunc {
 
 // ── GET /api/student/materials ────────────────────────────────────────────────
 
-func handleListStudentMaterials(db *sql.DB) http.HandlerFunc {
+func handleListStudentMaterials(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
 			SELECT m.id, m.title, m.original_name, m.file_type, m.file_size,
@@ -577,7 +577,7 @@ func handleListStudentMaterials(db *sql.DB) http.HandlerFunc {
 			       m.created_at
 			FROM materials m
 			LEFT JOIN material_views mv ON mv.material_id = m.id
-			GROUP BY m.id
+			GROUP BY m.id, m.title, m.original_name, m.file_type, m.file_size, m.created_at
 			ORDER BY m.created_at DESC
 		`)
 		if err != nil {
@@ -628,7 +628,7 @@ func handleListStudentMaterials(db *sql.DB) http.HandlerFunc {
 
 // ── RegisterStudentRoutes ─────────────────────────────────────────────────────
 
-func RegisterStudentRoutes(mux *http.ServeMux, db *sql.DB, sessions *SessionStore) {
+func RegisterStudentRoutes(mux *http.ServeMux, db *DB, sessions *SessionStore) {
 	guard := requireRole(sessions, "student")
 
 	// Lessons

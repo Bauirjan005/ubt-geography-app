@@ -11,6 +11,9 @@
 ubt.db
 ubt.db*
 
+# Backups
+backups/
+
 # User uploaded materials
 uploads/*
 !uploads/.gitkeep

@@ -321,7 +321,7 @@ func callClaudeForQuiz(text, difficulty string) ([]rawAIQuestion, error) {
 }
 
 // POST /api/teacher/materials/{id}/generate-quiz
-func handleGenerateAIQuiz(db *sql.DB) http.HandlerFunc {
+func handleGenerateAIQuiz(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -389,7 +389,7 @@ func handleGenerateAIQuiz(db *sql.DB) http.HandlerFunc {
 		}
 		defer tx.Rollback()
 
-		res, err := tx.Exec(
+		quizID, err := tx.InsertReturningID(
 			`INSERT INTO ai_quizzes (material_id, teacher_id, title, difficulty, created_at) VALUES (?, ?, ?, ?, ?)`,
 			materialID, sess.UserID, req.Title, req.Difficulty, time.Now().UTC(),
 		)
@@ -397,7 +397,6 @@ func handleGenerateAIQuiz(db *sql.DB) http.HandlerFunc {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to create quiz"})
 			return
 		}
-		quizID, _ := res.LastInsertId()
 
 		for i, q := range questions {
 			correct := strings.ToUpper(strings.TrimSpace(q.CorrectOption))
@@ -429,7 +428,7 @@ func handleGenerateAIQuiz(db *sql.DB) http.HandlerFunc {
 }
 
 // GET /api/teacher/ai-quizzes
-func handleListTeacherAIQuizzes(db *sql.DB) http.HandlerFunc {
+func handleListTeacherAIQuizzes(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 		rows, err := db.Query(`
@@ -443,7 +442,7 @@ func handleListTeacherAIQuizzes(db *sql.DB) http.HandlerFunc {
 			LEFT JOIN ai_questions aqu ON aqu.quiz_id = aq.id
 			LEFT JOIN ai_quiz_attempts att ON att.quiz_id = aq.id
 			WHERE aq.teacher_id = ?
-			GROUP BY aq.id
+			GROUP BY aq.id, aq.title, aq.difficulty, m.title, aq.created_at
 			ORDER BY aq.created_at DESC
 		`, sess.UserID)
 		if err != nil {
@@ -481,7 +480,7 @@ func handleListTeacherAIQuizzes(db *sql.DB) http.HandlerFunc {
 }
 
 // GET /api/teacher/ai-quizzes/{id}/results
-func handleGetAIQuizResults(db *sql.DB) http.HandlerFunc {
+func handleGetAIQuizResults(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sess := SessionFromContext(r)
 

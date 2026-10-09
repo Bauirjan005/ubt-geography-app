@@ -85,7 +85,7 @@ func validatePassword(pw string) string {
 // POST /api/register
 // Response 201: { message, role, user_id }
 // Response 400: { message } — validation failure or duplicate email
-func handleRegister(db *sql.DB) http.HandlerFunc {
+func handleRegister(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, AuthResponse{Message: "method not allowed"})
@@ -128,7 +128,7 @@ func handleRegister(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Persist the new user
-		result, err := db.Exec(
+		id, err := db.InsertReturningID(
 			`INSERT INTO users (username, email, password_hash, role, created_at)
 			 VALUES (?, ?, ?, ?, ?)`,
 			req.Username, req.Email, string(hash), req.Role, time.Now().UTC(),
@@ -138,7 +138,6 @@ func handleRegister(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		id, _ := result.LastInsertId()
 		writeJSON(w, http.StatusCreated, AuthResponse{
 			Message: "account created successfully",
 			Role:    req.Role,
@@ -156,7 +155,7 @@ func handleRegister(db *sql.DB) http.HandlerFunc {
 // POST /api/login
 // Response 200: { message, role, user_id } + Set-Cookie
 // Response 401: { message } — wrong credentials (deliberately vague)
-func handleLogin(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
+func handleLogin(db *DB, sessions *SessionStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, AuthResponse{Message: "method not allowed"})
@@ -271,7 +270,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 // GET /api/me
 // 200 — { id, username, email, role }
 // 401 — если не авторизован
-func handleMe(db *sql.DB, sessions *SessionStore) http.HandlerFunc {
+func handleMe(db *DB, sessions *SessionStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
 		if err != nil {

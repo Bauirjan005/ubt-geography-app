@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	_ "modernc.org/sqlite"
 )
 
@@ -51,9 +52,34 @@ func main() {
 
 	ensureUploadDir()
 
-	db, err := sql.Open("sqlite", "./ubt.db?_journal_mode=WAL&_foreign_keys=on")
-	if err != nil {
-		log.Fatalf("❌ Дерекқорды ашу мүмкін болмады: %v", err)
+	var db *DB
+	databaseURL := strings.TrimSpace(os.Getenv("DATABASE_URL"))
+	if databaseURL != "" {
+		cleanURL := strings.ReplaceAll(databaseURL, "&channel_binding=require", "")
+		cleanURL = strings.ReplaceAll(cleanURL, "?channel_binding=require&", "?")
+		cleanURL = strings.ReplaceAll(cleanURL, "?channel_binding=require", "")
+
+		log.Println("🐘 Neon PostgreSQL режимі іске қосылуда...")
+		sqlDB, err := sql.Open("postgres", cleanURL)
+		if err != nil {
+			log.Fatalf("❌ Postgres дерекқорын ашу мүмкін болмады: %v", err)
+		}
+		sqlDB.SetMaxOpenConns(20)
+		sqlDB.SetMaxIdleConns(5)
+		sqlDB.SetConnMaxLifetime(15 * time.Minute)
+
+		if err := sqlDB.Ping(); err != nil {
+			log.Fatalf("❌ Postgres байланыс қатесі: %v", err)
+		}
+		log.Println("✅ Neon PostgreSQL дерекқорына сәтті қосылды!")
+		db = &DB{DB: sqlDB, isPostgres: true}
+	} else {
+		log.Println("📁 SQLite режимі іске қосылуда (ubt.db)...")
+		sqlDB, err := sql.Open("sqlite", "./ubt.db?_journal_mode=WAL&_foreign_keys=on")
+		if err != nil {
+			log.Fatalf("❌ Дерекқорды ашу мүмкін болмады: %v", err)
+		}
+		db = &DB{DB: sqlDB, isPostgres: false}
 	}
 	defer db.Close()
 

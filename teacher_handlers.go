@@ -42,7 +42,7 @@ type ListLessonsResponse struct {
 	Lessons []LessonSummary `json:"lessons"`
 }
 
-func handleListLessons(db *sql.DB) http.HandlerFunc {
+func handleListLessons(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -76,7 +76,7 @@ func handleListLessons(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleCreateLesson(db *sql.DB) http.HandlerFunc {
+func handleCreateLesson(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -101,7 +101,7 @@ func handleCreateLesson(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		result, err := db.Exec(
+		id, err := db.InsertReturningID(
 			`INSERT INTO lessons (teacher_id, title, content, created_at) VALUES (?, ?, ?, ?)`,
 			sess.UserID, req.Title, req.Content, time.Now().UTC(),
 		)
@@ -109,12 +109,11 @@ func handleCreateLesson(db *sql.DB) http.HandlerFunc {
 			writeJSON(w, http.StatusInternalServerError, map[string]string{"message": "failed to save lesson"})
 			return
 		}
-		id, _ := result.LastInsertId()
 		writeJSON(w, http.StatusCreated, CreateLessonResponse{Message: "lesson created", LessonID: id})
 	}
 }
 
-func handleSaveQuestions(db *sql.DB) http.HandlerFunc {
+func handleSaveQuestions(db *DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"message": "method not allowed"})
@@ -204,7 +203,7 @@ func handleSaveQuestions(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func RegisterTeacherRoutes(mux *http.ServeMux, db *sql.DB, sessions *SessionStore) {
+func RegisterTeacherRoutes(mux *http.ServeMux, db *DB, sessions *SessionStore) {
 	guard := requireRole(sessions, "teacher")
 
 	mux.Handle("/api/teacher/lessons", guard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

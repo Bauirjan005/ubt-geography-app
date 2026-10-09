@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"database/sql"
 	"encoding/hex"
 	"errors"
 	"log"
@@ -18,16 +17,16 @@ type Session struct {
 	ExpiresAt time.Time
 }
 
-// SessionStore manages sessions in memory with SQLite persistence.
+// SessionStore manages sessions in memory with database persistence.
 type SessionStore struct {
-	db       *sql.DB
+	db       *DB
 	mu       sync.RWMutex
 	sessions map[string]*Session
 }
 
 const sessionTTL = 30 * 24 * time.Hour // 30 days session validity
 
-func NewSessionStore(db *sql.DB) *SessionStore {
+func NewSessionStore(db *DB) *SessionStore {
 	s := &SessionStore{
 		db:       db,
 		sessions: make(map[string]*Session),
