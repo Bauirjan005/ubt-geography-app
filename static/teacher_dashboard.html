@@ -681,6 +681,28 @@
       .preview-options-grid { grid-template-columns: 1fr; }
     }
 
+    @media (max-width: 600px) {
+      header { padding: 0 12px; height: 54px; }
+      .logo-wrap { gap: 8px; }
+      .geo-logo-badge { width: 34px; height: 34px; }
+      .geo-logo-badge svg { width: 22px; height: 22px; }
+      .logo-main { font-size: 15px; }
+      .logo-sub { display: none; }
+      .teacher-badge { font-size: 11px; padding: 3px 8px; }
+      .btn-exit { font-size: 12px; padding: 4px 10px; }
+      aside { padding: 8px 10px; gap: 4px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+      aside::-webkit-scrollbar { display: none; }
+      .nav-btn { font-size: 12px; padding: 7px 10px; white-space: nowrap; flex-shrink: 0; }
+      main { padding: 14px 10px; }
+      .card { padding: 18px 14px; border-radius: 12px; }
+      .card-title { font-size: 16px; }
+      .q-opts { grid-template-columns: 1fr; }
+      .btn { width: 100%; justify-content: center; }
+      .btn-row { flex-direction: column; }
+      .modal { padding: 18px 14px; width: 95vw; border-radius: 12px; }
+      .bar-row { grid-template-columns: 90px 1fr 38px; gap: 6px; }
+    }
+
     /* ── Student Results & Analytics Section ────────────────────────────── */
     .res-stats-grid {
       display: grid;
