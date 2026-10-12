@@ -69,5 +69,17 @@ func main() {
 	_ = db.QueryRow("SELECT count(*) FROM materials").Scan(&mCount)
 	fmt.Printf("✅ Materials in Neon PG: %d\n", mCount)
 
+	mRows, err := db.Query("SELECT id, title, filename, original_name, octet_length(file_data) FROM materials ORDER BY id ASC")
+	if err == nil {
+		for mRows.Next() {
+			var mid int64
+			var mTitle, mFn, mOrig string
+			var blobLen sql.NullInt64
+			_ = mRows.Scan(&mid, &mTitle, &mFn, &mOrig, &blobLen)
+			fmt.Printf("   -> Mat #%d: '%s' (%s) | DB Blob: %d bytes\n", mid, mTitle, mOrig, blobLen.Int64)
+		}
+		mRows.Close()
+	}
+
 	fmt.Println("\n🎉 ALL CHECKS PASSED ON NEON POSTGRESQL!")
 }
