@@ -95,6 +95,8 @@ func main() {
 	mux.Handle("/api/login", handleLogin(db, sessions))
 	mux.Handle("/api/logout", requireAuth(sessions)(handleLogout(sessions)))
 	mux.Handle("/api/me", handleMe(db, sessions))
+	mux.Handle("/api/forgot-password", handleForgotPassword(db))
+	mux.Handle("/api/reset-password", handleResetPassword(db, sessions))
 
 	// ── Teacher: lessons + questions ──────────────────────────────────────────
 	RegisterTeacherRoutes(mux, db, sessions)

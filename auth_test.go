@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestNeonDatabaseAndAuth(t *testing.T) {
@@ -32,8 +33,16 @@ func TestNeonDatabaseAndAuth(t *testing.T) {
 	defer sqlDB.Close()
 
 	db := &DB{DB: sqlDB, isPostgres: true}
-	if err := db.Ping(); err != nil {
-		t.Fatalf("Ping failed: %v", err)
+	var pingErr error
+	for attempt := 0; attempt < 4; attempt++ {
+		pingErr = db.Ping()
+		if pingErr == nil {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+	if pingErr != nil {
+		t.Fatalf("Ping failed: %v", pingErr)
 	}
 
 	// 1. Verify users table has 12 users
@@ -101,9 +110,86 @@ func TestNeonDatabaseAndAuth(t *testing.T) {
 		t.Errorf("Expected role teacher, got %v", meResp["role"])
 	}
 
+	if err := migrateAll(db); err != nil {
+		t.Fatalf("migrateAll failed: %v", err)
+	}
+
 	// Cleanup test session
 	sessions.Delete(sessID)
 	t.Logf("✅ Verified Neon PostgreSQL integration: %d users, %d AI questions, handleLogin, and handleMe worked flawlessly!", userCount, qCount)
+
+	// 5. Test Forgot Password & Reset Password Flow
+	forgotHandler := handleForgotPassword(db)
+
+	// Non-existent email
+	bodyNonExist, _ := json.Marshal(ForgotPasswordRequest{Email: "notfound@example.com"})
+	reqForgotBad := httptest.NewRequest(http.MethodPost, "/api/forgot-password", bytes.NewReader(bodyNonExist))
+	rrForgotBad := httptest.NewRecorder()
+	forgotHandler.ServeHTTP(rrForgotBad, reqForgotBad)
+	if rrForgotBad.Code != http.StatusNotFound {
+		t.Errorf("Expected 404 for non-existent email in forgot-password, got %d", rrForgotBad.Code)
+	}
+
+	// Valid email (sara@gmail.com)
+	var origSaraHash string
+	_ = db.QueryRow(`SELECT password_hash FROM users WHERE email = 'sara@gmail.com'`).Scan(&origSaraHash)
+	defer func() {
+		if origSaraHash != "" {
+			_, _ = db.Exec(`UPDATE users SET password_hash = ? WHERE email = 'sara@gmail.com'`, origSaraHash)
+		}
+	}()
+
+	bodySara, _ := json.Marshal(ForgotPasswordRequest{Email: "sara@gmail.com"})
+	reqForgot := httptest.NewRequest(http.MethodPost, "/api/forgot-password", bytes.NewReader(bodySara))
+	rrForgot := httptest.NewRecorder()
+	forgotHandler.ServeHTTP(rrForgot, reqForgot)
+	if rrForgot.Code != http.StatusOK {
+		t.Fatalf("Expected 200 for valid forgot-password, got %d: %s", rrForgot.Code, rrForgot.Body.String())
+	}
+
+	var forgotResp ForgotPasswordResponse
+	if err := json.Unmarshal(rrForgot.Body.Bytes(), &forgotResp); err != nil {
+		t.Fatalf("Failed to parse forgot response: %v", err)
+	}
+
+	// Verify code in DB
+	var dbCode string
+	err = db.QueryRow(`SELECT code FROM password_resets WHERE email = 'sara@gmail.com' AND used = false ORDER BY id DESC LIMIT 1`).Scan(&dbCode)
+	if err != nil {
+		t.Fatalf("Failed to retrieve reset code from DB: %v", err)
+	}
+	if len(dbCode) != 6 {
+		t.Errorf("Expected 6-digit code, got %s", dbCode)
+	}
+
+	// Reset with wrong code
+	resetHandler := handleResetPassword(db, sessions)
+	bodyResetBad, _ := json.Marshal(ResetPasswordRequest{
+		Email:       "sara@gmail.com",
+		Code:        "000000",
+		NewPassword: "SaraNewPass123",
+	})
+	reqResetBad := httptest.NewRequest(http.MethodPost, "/api/reset-password", bytes.NewReader(bodyResetBad))
+	rrResetBad := httptest.NewRecorder()
+	resetHandler.ServeHTTP(rrResetBad, reqResetBad)
+	if rrResetBad.Code != http.StatusBadRequest {
+		t.Errorf("Expected 400 for wrong reset code, got %d", rrResetBad.Code)
+	}
+
+	// Reset with valid code
+	bodyResetOk, _ := json.Marshal(ResetPasswordRequest{
+		Email:       "sara@gmail.com",
+		Code:        dbCode,
+		NewPassword: "SaraNewPass123",
+	})
+	reqResetOk := httptest.NewRequest(http.MethodPost, "/api/reset-password", bytes.NewReader(bodyResetOk))
+	rrResetOk := httptest.NewRecorder()
+	resetHandler.ServeHTTP(rrResetOk, reqResetOk)
+	if rrResetOk.Code != http.StatusOK {
+		t.Fatalf("Expected 200 for valid reset, got %d: %s", rrResetOk.Code, rrResetOk.Body.String())
+	}
+
+	t.Logf("✅ Successfully tested Forgot Password & Reset Password flow with 6-digit verification code!")
 }
 
 func openPostgres(url string) (*sql.DB, error) {

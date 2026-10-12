@@ -167,6 +167,38 @@
       75%      { transform:translateX(6px); }
     }
 
+    .forgot-link {
+      font-size: 13px;
+      color: var(--forest);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .forgot-link:hover {
+      color: var(--forest3);
+      text-decoration: underline;
+    }
+
+    .info-box {
+      background: rgba(13, 94, 56, 0.08);
+      border: 1px solid rgba(13, 94, 56, 0.25);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--forest);
+      line-height: 1.45;
+      text-align: left;
+    }
+    .info-box.dev-mode {
+      background: rgba(245, 158, 11, 0.09);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #b45309;
+    }
+
     .spinner {
       display:inline-block; width:16px; height:16px;
       border:2px solid rgba(255,255,255,.4); border-top-color:#fff;
@@ -269,7 +301,99 @@
             </button>
           </div>
         </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:-6px;margin-bottom:6px">
+          <a href="javascript:void(0)" onclick="switchTab('forgot')" class="forgot-link">
+            🔑 Құпия сөзді ұмыттыңыз ба? / Забыли пароль?
+          </a>
+        </div>
         <button class="btn-submit" id="btn-login" onclick="doLogin()">Войти</button>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="form-forgot" style="display:none">
+      <div class="form">
+        <div style="margin-bottom:12px;text-align:left">
+          <div style="font-weight:700;font-size:16px;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:6px">
+            <span>🔑</span> Құпия сөзді қалпына келтіру
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.45">
+            Тіркелген email мекенжайыңызды енгізіңіз. Растау коды арқылы жаңа құпия сөз орната аласыз.
+          </div>
+        </div>
+
+        <div id="forgot-notice" class="info-box" style="display:none;margin-bottom:12px"></div>
+
+        <!-- 1-қадам: Email енгізу және код сұрау -->
+        <div id="forgot-step-1">
+          <div class="field">
+            <label for="forgot-email">Email</label>
+            <input type="email" id="forgot-email" placeholder="example@gmail.com" autocomplete="email"/>
+          </div>
+          <button class="btn-submit" id="btn-forgot-send" onclick="doSendResetCode()" style="margin-top:8px">
+            ✉️ Растау кодын алу / Получить код
+          </button>
+          <div style="text-align:center;margin-top:14px">
+            <a href="javascript:void(0)" onclick="switchTab('login')" class="forgot-link">
+              ← Кіру бөліміне қайту / Назад ко входу
+            </a>
+          </div>
+        </div>
+
+        <!-- 2-қадам: Код пен жаңа құпия сөзді енгізу -->
+        <div id="forgot-step-2" style="display:none">
+          <div class="field">
+            <label for="reset-code">6 таңбалы растау коды / Код подтверждения</label>
+            <input type="text" id="reset-code" placeholder="123456" maxlength="6" inputmode="numeric" style="font-size:20px;letter-spacing:6px;font-weight:700;text-align:center;font-family:monospace;background:#fff;border-color:var(--forest)"/>
+          </div>
+
+          <div class="field">
+            <label for="reset-new-password">Жаңа құпия сөз / Новый пароль (мин. 8 таңба, 1 бас әріп, 1 сан)</label>
+            <div class="password-wrapper">
+              <input type="password" id="reset-new-password" placeholder="Жаңа құпия сөз" autocomplete="new-password"/>
+              <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('reset-new-password', this)" title="Показать пароль" aria-label="Показать пароль">
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <svg class="eye-open" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="reset-new-password-confirm">Құпия сөзді қайталаңыз / Повторите пароль</label>
+            <div class="password-wrapper">
+              <input type="password" id="reset-new-password-confirm" placeholder="Құпия сөзді қайталаңыз" autocomplete="new-password"/>
+              <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('reset-new-password-confirm', this)" title="Показать пароль" aria-label="Показать пароль">
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <svg class="eye-open" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-submit" id="btn-reset-submit" onclick="doResetPassword()" style="margin-top:8px">
+            ✅ Құпия сөзді сақтау / Сохранить новый пароль
+          </button>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:13px">
+            <a href="javascript:void(0)" onclick="doResendResetCode()" class="forgot-link">
+              🔄 Кодты қайта жіберу
+            </a>
+            <a href="javascript:void(0)" onclick="switchTab('login')" class="forgot-link">
+              ← Кіруге қайту
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -359,9 +483,143 @@
   function switchTab(tab) {
     document.getElementById('form-login').style.display    = tab==='login'    ? '' : 'none';
     document.getElementById('form-register').style.display = tab==='register' ? '' : 'none';
+    const forgotForm = document.getElementById('form-forgot');
+    if (forgotForm) forgotForm.style.display = tab === 'forgot' ? '' : 'none';
+
     document.getElementById('tab-login').classList.toggle('active', tab==='login');
     document.getElementById('tab-reg').classList.toggle('active',   tab==='register');
     hideError();
+    hideForgotNotice();
+
+    if (tab === 'forgot') {
+      const loginEmail = document.getElementById('login-email').value.trim();
+      if (loginEmail && document.getElementById('forgot-email')) {
+        document.getElementById('forgot-email').value = loginEmail;
+      }
+      document.getElementById('forgot-step-1').style.display = '';
+      document.getElementById('forgot-step-2').style.display = 'none';
+    }
+  }
+
+  function showForgotNotice(msg, isDev) {
+    const el = document.getElementById('forgot-notice');
+    if (!el) return;
+    el.innerHTML = msg;
+    el.className = isDev ? 'info-box dev-mode' : 'info-box';
+    el.style.display = 'block';
+  }
+
+  function hideForgotNotice() {
+    const el = document.getElementById('forgot-notice');
+    if (el) el.style.display = 'none';
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s]));
+  }
+
+  // ── Құпия сөзді қалпына келтіру: Код сұрау ───────────────────────────────
+  async function doSendResetCode() {
+    hideError();
+    hideForgotNotice();
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email || !email.includes('@')) {
+      showError('Дұрыс email мекенжайын енгізіңіз / Введите корректный email');
+      return;
+    }
+
+    const btn = document.getElementById('btn-forgot-send');
+    setBusy(btn, true);
+    try {
+      const r = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        showError(d.message || 'Қате орын алды / Произошла ошибка');
+        return;
+      }
+
+      document.getElementById('forgot-step-1').style.display = 'none';
+      document.getElementById('forgot-step-2').style.display = '';
+
+      if (d.dev_code) {
+        showForgotNotice(`🔔 <strong>Сынақ коды:</strong> <span style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px">${d.dev_code}</span><br><span style="font-size:12px;opacity:0.9">Пошта сервері (SMTP) бапталмағандықтан, код осында көрсетілді. Кодты енгізіп, жаңа құпия сөз орнатыңыз.</span>`, true);
+        const codeInput = document.getElementById('reset-code');
+        if (codeInput) {
+          codeInput.value = d.dev_code;
+          const pwInput = document.getElementById('reset-new-password');
+          if (pwInput) pwInput.focus();
+        }
+      } else {
+        showForgotNotice(`✉️ Растау коды <strong>${escapeHtml(email)}</strong> поштасына жіберілді! Поштаңызды (және Спам бөлімін) тексеріңіз.`, false);
+        const codeInput = document.getElementById('reset-code');
+        if (codeInput) codeInput.focus();
+      }
+    } catch (_) {
+      showError('Сервермен байланыс жоқ / Нет соединения с сервером');
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  function doResendResetCode() {
+    document.getElementById('forgot-step-1').style.display = '';
+    document.getElementById('forgot-step-2').style.display = 'none';
+    hideForgotNotice();
+    doSendResetCode();
+  }
+
+  // ── Құпия сөзді сақтау: Жаңа пароль орнату ────────────────────────────────
+  async function doResetPassword() {
+    hideError();
+    const email = document.getElementById('forgot-email').value.trim();
+    const code  = document.getElementById('reset-code').value.trim();
+    const pw1   = document.getElementById('reset-new-password').value;
+    const pw2   = document.getElementById('reset-new-password-confirm').value;
+
+    if (!code || !pw1 || !pw2) {
+      showError('Барлық өрістерді толтырыңыз / Заполните все поля');
+      return;
+    }
+    if (code.length !== 6) {
+      showError('Растау коды 6 таңбадан тұруы керек / Код должен состоять из 6 цифр');
+      return;
+    }
+    if (pw1 !== pw2) {
+      showError('Құпия сөздер сәйкес келмейді / Пароли не совпадают');
+      return;
+    }
+
+    const btn = document.getElementById('btn-reset-submit');
+    setBusy(btn, true);
+    try {
+      const r = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code, new_password: pw1 })
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        showError(d.message || 'Қате орын алды / Ошибка сброса пароля');
+        return;
+      }
+
+      localStorage.setItem('ubt_saved_email', email);
+
+      if (d.role === 'teacher') {
+        location.replace('/teacher_dashboard.html');
+      } else {
+        location.replace('/student_dashboard.html');
+      }
+    } catch (_) {
+      showError('Сервермен байланыс жоқ / Нет соединения с сервером');
+    } finally {
+      setBusy(btn, false);
+    }
   }
 
   function showError(msg) {
@@ -455,7 +713,20 @@
   document.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const loginVisible = document.getElementById('form-login').style.display !== 'none';
-    if (loginVisible) doLogin(); else doRegister();
+    const regVisible = document.getElementById('form-register').style.display !== 'none';
+    const forgotVisible = document.getElementById('form-forgot') && document.getElementById('form-forgot').style.display !== 'none';
+
+    if (loginVisible) {
+      doLogin();
+    } else if (regVisible) {
+      doRegister();
+    } else if (forgotVisible) {
+      if (document.getElementById('forgot-step-1').style.display !== 'none') {
+        doSendResetCode();
+      } else {
+        doResetPassword();
+      }
+    }
   });
 </script>
 </body>
