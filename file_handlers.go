@@ -157,14 +157,15 @@ func handleUploadMaterial(db *DB) http.HandlerFunc {
 		}
 
 		id, err := db.InsertReturningID(
-			`INSERT INTO materials (teacher_id, title, filename, original_name, file_type, file_size, created_at)
-			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			`INSERT INTO materials (teacher_id, title, filename, original_name, file_type, file_size, file_data, created_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 			sess.UserID,
 			req.Title,
 			storedName,
 			req.Filename,
 			mimeType,
 			len(fileData),
+			fileData,
 			time.Now().UTC(),
 		)
 		if err != nil {
@@ -346,17 +347,16 @@ func handleViewMaterial(db *DB) http.HandlerFunc {
 			fileType     string
 			originalName string
 			title        string
+			fileData     []byte
 		)
 
 		err = db.QueryRow(
-			`SELECT filename, file_type, original_name, title FROM materials WHERE id = ?`,
+			`SELECT filename, file_type, original_name, title, file_data FROM materials WHERE id = ?`,
 			materialID,
-		).Scan(&filename, &fileType, &originalName, &title)
+		).Scan(&filename, &fileType, &originalName, &title, &fileData)
 
 		if err == sql.ErrNoRows {
-			writeJSON(w, http.StatusNotFound, map[string]string{
-				"message": "Материал табылмады / Не найдено",
-			})
+			renderErrorPage(w, "Материал табылмады", "Кешіріңіз, бұл материал дерекқорда табылмады.")
 			return
 		}
 
@@ -377,10 +377,22 @@ func handleViewMaterial(db *DB) http.HandlerFunc {
 
 		fPath := filepath.Join(uploadDir, filename)
 		fileBytes, err := os.ReadFile(fPath)
-		if err != nil {
-			writeJSON(w, http.StatusNotFound, map[string]string{
-				"message": "Файл дискте табылмады / Файл не найден на сервере",
-			})
+		if err != nil || len(fileBytes) == 0 {
+			if len(fileData) > 0 {
+				fileBytes = fileData
+				// Restore to disk cache
+				_ = os.WriteFile(fPath, fileBytes, 0644)
+			}
+		}
+
+		if len(fileBytes) == 0 {
+			if strings.HasSuffix(r.URL.Path, "/content") || r.URL.Query().Get("format") == "json" {
+				writeJSON(w, http.StatusNotFound, map[string]string{
+					"message": "Файл табылмады / Файл не найден",
+				})
+				return
+			}
+			renderErrorPage(w, "Файл табылмады", "Кешіріңіз, бұл файл серверде табылмады. Мұғалім материалды қайта жүктеуі қажет.")
 			return
 		}
 
@@ -449,6 +461,39 @@ func handleViewMaterial(db *DB) http.HandlerFunc {
 		// 5. TXT / MD үшін заманауи оқу залы (HTML Reader)
 		renderHTMLReader(w, materialID, title, originalName, len(fileBytes), ensureUTF8(fileBytes))
 	}
+}
+
+// ─── renderErrorPage ─────────────────────────────────────────────────────────
+
+func renderErrorPage(w http.ResponseWriter, title, message string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusNotFound)
+	html := fmt.Sprintf(`<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>%s | ҰБТ География</title>
+  <style>
+    body { background: #0b0f19; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+    .card { background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 36px; max-width: 460px; width: 100%%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .icon { font-size: 48px; margin-bottom: 16px; }
+    h2 { margin: 0 0 12px; font-size: 22px; color: #f87171; }
+    p { margin: 0 0 24px; color: #94a3b8; font-size: 15px; line-height: 1.6; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; background: #10b981; color: #fff; text-decoration: none; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: background .2s; }
+    .btn:hover { background: #059669; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📁⚠️</div>
+    <h2>%s</h2>
+    <p>%s</p>
+    <button class="btn" onclick="window.history.length > 1 ? window.history.back() : window.location.href='/student_dashboard.html'">← Артқа қайту</button>
+  </div>
+</body>
+</html>`, html.EscapeString(title), html.EscapeString(title), html.EscapeString(message))
+	w.Write([]byte(html))
 }
 
 // ─── renderHTMLReader ─────────────────────────────────────────────────────────

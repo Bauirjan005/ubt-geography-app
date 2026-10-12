@@ -67,6 +67,7 @@ func migratePostgres(db *DB) error {
 			file_size     BIGINT      NOT NULL DEFAULT 0,
 			created_at    TIMESTAMPTZ NOT NULL
 		)`,
+		`ALTER TABLE materials ADD COLUMN IF NOT EXISTS file_data BYTEA`,
 		`CREATE INDEX IF NOT EXISTS idx_materials_teacher ON materials(teacher_id)`,
 
 		// ── material_views ────────────────────────────────────────────────────
@@ -292,6 +293,12 @@ func migrateSQLite(db *DB) error {
 	_ = db.DB.QueryRow(`SELECT count(*) FROM pragma_table_info('ai_quizzes') WHERE name='status'`).Scan(&hasCol)
 	if hasCol == 0 {
 		_, _ = db.DB.Exec(`ALTER TABLE ai_quizzes ADD COLUMN status TEXT NOT NULL DEFAULT 'published'`)
+	}
+
+	var hasFileData int
+	_ = db.DB.QueryRow(`SELECT count(*) FROM pragma_table_info('materials') WHERE name='file_data'`).Scan(&hasFileData)
+	if hasFileData == 0 {
+		_, _ = db.DB.Exec(`ALTER TABLE materials ADD COLUMN file_data BLOB`)
 	}
 
 	return nil
