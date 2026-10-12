@@ -659,12 +659,13 @@ func RegisterStudentRoutes(mux *http.ServeMux, db *DB, sessions *SessionStore) {
 		handleGetAIQuizForStudent(db)(w, r)
 	})))
 
-	// Materials
-	mux.Handle("/api/student/materials", guard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// Materials (student + teacher)
+	matGuard := requireRole(sessions, "student", "teacher")
+	mux.Handle("/api/student/materials", matGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handleListStudentMaterials(db)(w, r)
 	})))
 
-	mux.Handle("/api/student/materials/", guard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/api/student/materials/", matGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handleViewMaterial(db)(w, r)
 	})))
 }

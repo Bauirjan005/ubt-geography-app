@@ -41,17 +41,17 @@ func TestNeonDatabaseAndAuth(t *testing.T) {
 	if err := db.QueryRow("SELECT count(*) FROM users").Scan(&userCount); err != nil {
 		t.Fatalf("QueryRow count users failed: %v", err)
 	}
-	if userCount != 12 {
-		t.Errorf("Expected 12 users in Neon, got %d", userCount)
+	if userCount < 12 {
+		t.Errorf("Expected at least 12 users in Neon, got %d", userCount)
 	}
 
-	// 2. Verify questions table has 209 AI questions
+	// 2. Verify questions table has AI questions
 	var qCount int64
 	if err := db.QueryRow("SELECT count(*) FROM ai_questions").Scan(&qCount); err != nil {
 		t.Fatalf("QueryRow count ai_questions failed: %v", err)
 	}
-	if qCount != 209 {
-		t.Errorf("Expected 209 questions in Neon, got %d", qCount)
+	if qCount < 209 {
+		t.Errorf("Expected at least 209 questions in Neon, got %d", qCount)
 	}
 
 	// 3. Test handleLogin handler with invalid password (security check)

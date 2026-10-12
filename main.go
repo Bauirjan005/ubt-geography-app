@@ -125,6 +125,10 @@ func main() {
 				handleMaterialReaders(db)(w, r)
 				return
 			}
+			if (strings.HasSuffix(r.URL.Path, "/view") || strings.HasSuffix(r.URL.Path, "/content")) && r.Method == http.MethodGet {
+				handleViewMaterial(db)(w, r)
+				return
+			}
 			writeJSON(w, http.StatusNotFound, map[string]string{"message": "not found"})
 		})))
 

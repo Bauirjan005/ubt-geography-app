@@ -1621,6 +1621,9 @@ function renderMaterials() {
         </div>
         <div style="display:flex;gap:7px;align-items:center;flex-shrink:0">
           <span class="type-badge">${fmtType(m.file_type)}</span>
+          <a href="/api/student/materials/${m.id}/view" target="_blank" class="view-badge" style="cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:4px" title="Оқу / Қарау">
+            📖 Оқу
+          </a>
           <button class="view-badge" style="cursor:pointer;border:none"
                   onclick="showReaders(${m.id}, '${m.title.replace(/'/g,"\\'")}')">
             👁 ${m.view_count} оқушы

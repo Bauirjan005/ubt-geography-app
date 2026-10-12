@@ -128,9 +128,20 @@
     .expl-box { background:var(--ocean-l); border:1px solid rgba(30,77,107,.2); border-radius:8px; padding:11px 14px; margin-top:12px; font-size:13px; color:var(--ocean); line-height:1.6; display:none; }
     .expl-box.show { display:block; animation:fadeUp .2s ease; }
     .q-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:center; }
-    /* Material link */
-    .material-link { display:inline-flex; align-items:center; gap:7px; background:var(--ocean-l); border:1px solid rgba(30,77,107,.2); color:var(--ocean); padding:8px 14px; border-radius:var(--radius); font-size:13px; text-decoration:none; margin-bottom:16px; transition:background .2s; }
-    .material-link:hover { background:#c6e4f4; }
+    /* Material in-pane reader & actions */
+    .mat-action-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:var(--radius); font-size:13px; font-weight:600; text-decoration:none; transition:all .2s; cursor:pointer; }
+    .mat-action-btn.primary { background:var(--forest); color:#fff; border:1px solid var(--forest); }
+    .mat-action-btn.primary:hover { background:var(--forest2); transform:translateY(-1px); box-shadow:0 4px 12px rgba(13,94,56,.25); }
+    .mat-action-btn.secondary { background:var(--paper); color:var(--ink); border:1.5px solid var(--border); }
+    .mat-action-btn.secondary:hover { border-color:var(--forest); color:var(--forest); }
+    .material-pdf-wrap { width:100%; border-radius:12px; overflow:hidden; border:1.5px solid var(--border); box-shadow:0 4px 16px rgba(0,0,0,0.06); background:#fff; margin-top:8px; }
+    .material-pdf-frame { width:100%; height:750px; border:none; display:block; }
+    .material-reader-box { background:var(--paper); border:1.5px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.04); margin-top:8px; }
+    .reader-toolbar { display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:var(--parchment); border-bottom:1.5px solid var(--border); flex-wrap:wrap; gap:10px; }
+    .reader-btn { background:var(--paper); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; color:var(--ink); transition:all .15s; }
+    .reader-btn:hover { border-color:var(--forest); color:var(--forest); }
+    .reader-body { padding:28px 32px; max-height:680px; overflow-y:auto; }
+    .material-pre { font-family:var(--sans); font-size:15px; line-height:1.85; color:var(--ink); white-space:pre-wrap; word-wrap:break-word; tab-size:4; user-select:text; }
     .spinner { display:inline-block; width:17px; height:17px; border:2px solid var(--border); border-top-color:var(--forest); border-radius:50%; animation:spin .7s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
     ::-webkit-scrollbar { width:5px; }
@@ -256,7 +267,7 @@ checkAuth().then(user => { if(user && typeof init==='function') init(); });
 // ── State ──────────────────────────────────────────────────────────────────────
 let mainTab = 'lessons';
 let allLessons=[], allAIQuizzes=[], allMaterials=[];
-let activeLesson=null, aiQuiz=null;
+let activeLesson=null, aiQuiz=null, activeMaterialId=null;
 let answers={}, submitted=false;
 let aiSelected=null, qIndex=0, aiScore=0, qState='idle';
 
@@ -356,22 +367,125 @@ function filterSidebar() {
   } else {
     const items = allMaterials.filter(m=>m.title.toLowerCase().includes(q));
     el.innerHTML = items.length ? items.map((m,i)=>`
-      <div class="list-card" style="animation-delay:${i*.05}s" onclick="openMaterial(${m.id},'${m.title.replace(/'/g,"\\'")}')">
-        <div class="lc-title">${m.title}</div>
-        <div class="lc-meta"><span>${m.original_name}</span><span>👁 ${m.view_count}</span></div>
+      <div class="list-card ${activeMaterialId===m.id?'active':''}" style="animation-delay:${i*.05}s" onclick="openMaterial(${m.id})">
+        <div class="lc-title">${escapeHtml(m.title)}</div>
+        <div class="lc-meta"><span>${escapeHtml(m.original_name)}</span><span>👁 ${m.view_count||0}</span></div>
       </div>`).join('') : '<div style="font-size:13px;color:var(--muted);padding:8px 4px">Материал жоқ</div>';
   }
 }
 
 // ── Open material ──────────────────────────────────────────────────────────────
-function openMaterial(id, title) {
+let currentTextSize = 15;
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function fmtSize(b) {
+  if (!b) return '0 B';
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' КБ';
+  return (b/(1024*1024)).toFixed(1) + ' МБ';
+}
+
+function adjustTextSize(delta) {
+  currentTextSize = Math.max(12, Math.min(26, currentTextSize + delta * 2));
+  const el = document.getElementById('material-pre-text');
+  if (el) el.style.fontSize = currentTextSize + 'px';
+}
+
+function copyReaderText() {
+  const el = document.getElementById('material-pre-text');
+  if (el) {
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      alert('Мәтін көшірілді! / Текст скопирован!');
+    }).catch(() => {});
+  }
+}
+
+async function openMaterial(id, title) {
+  activeMaterialId = id;
+  filterSidebar();
+
+  const m = allMaterials.find(x => x.id === id) || { id, title: title||'', original_name: 'файл', file_type: '', file_size: 0 };
+  const matTitle = m.title || title || 'Оқу материалы';
+  const isPDF = (m.file_type && m.file_type.includes('pdf')) || (m.original_name && m.original_name.toLowerCase().endsWith('.pdf'));
+
   setPane(`
-    <div class="lesson-eyebrow">Оқу материалы</div>
-    <div class="lesson-heading">${title}</div>
-    <div style="margin-top:16px">
-      <a class="material-link" href="/api/student/materials/${id}/view" target="_blank">📄 Файлды ашу</a>
-      <p style="font-size:13px;color:var(--muted);margin-top:10px">Файл жаңа қойындыда ашылады. Көру саны автоматты тіркеледі.</p>
-    </div>`);
+    <div class="lesson-eyebrow">📁 Оқу материалы • Кітапхана</div>
+    <div class="lesson-heading">${escapeHtml(matTitle)}</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:12px 0 20px;font-size:13px;color:var(--muted)">
+      <span>📄 <strong>${escapeHtml(m.original_name)}</strong></span>
+      <span>•</span>
+      <span>💾 ${fmtSize(m.file_size)}</span>
+      <span>•</span>
+      <span>👁 ${m.view_count || 1} оқушы көрді</span>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+      <a class="mat-action-btn primary" href="/api/student/materials/${id}/view" target="_blank">
+        ↗️ Жаңа терезеде ашу
+      </a>
+      <a class="mat-action-btn secondary" href="/api/student/materials/${id}/view?download=1">
+        📥 Жүктеу (Скачать)
+      </a>
+    </div>
+
+    <div id="material-view-area">
+      ${isPDF ? `
+        <div class="material-pdf-wrap">
+          <iframe src="/api/student/materials/${id}/view" class="material-pdf-frame" title="${escapeHtml(matTitle)}"></iframe>
+        </div>
+      ` : `
+        <div class="material-reader-box">
+          <div class="reader-toolbar">
+            <span style="font-weight:600;font-size:13px;color:var(--forest)">📖 Мәтінді оқу режимі</span>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="reader-btn" onclick="adjustTextSize(-1)" title="Қаріпті кішірейту">A-</button>
+              <button class="reader-btn" onclick="adjustTextSize(1)" title="Қаріпті үлкейту">A+</button>
+              <button class="reader-btn" onclick="copyReaderText()" title="Көшіру">📋 Көшіру</button>
+            </div>
+          </div>
+          <div id="reader-content-body" class="reader-body">
+            <div style="display:flex;align-items:center;gap:10px;padding:30px;color:var(--muted)">
+              <div class="spinner"></div> Материал жүктелуде...
+            </div>
+          </div>
+        </div>
+      `}
+    </div>
+  `);
+
+  if (!isPDF) {
+    try {
+      const res = await fetch(`/api/student/materials/${id}/content`);
+      if (res.ok) {
+        const data = await res.json();
+        const contentBody = document.getElementById('reader-content-body');
+        if (contentBody) {
+          contentBody.innerHTML = `<pre id="material-pre-text" class="material-pre">${escapeHtml(data.content || '')}</pre>`;
+        }
+      } else {
+        const r2 = await fetch(`/api/student/materials/${id}/view?raw=1`);
+        const txt = await r2.text();
+        const contentBody = document.getElementById('reader-content-body');
+        if (contentBody) {
+          contentBody.innerHTML = `<pre id="material-pre-text" class="material-pre">${escapeHtml(txt)}</pre>`;
+        }
+      }
+    } catch(err) {
+      const contentBody = document.getElementById('reader-content-body');
+      if (contentBody) {
+        contentBody.innerHTML = `<div style="color:var(--wrong);padding:20px">Қате: файлды жүктеу мүмкін болмады. <a href="/api/student/materials/${id}/view" target="_blank" style="color:var(--ocean)">Осы жерден ашып көріңіз</a></div>`;
+      }
+    }
+  }
 }
 
 // ── Regular lesson quiz ────────────────────────────────────────────────────────
